@@ -18,9 +18,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: Colors.white,
           ),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Register',
+          style: TextStyle(color: Colors.white),
         ),
       ),
       body: Padding(
