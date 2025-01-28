@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "Flutter Chat",
+  "welcomeMessage": "Welcome to Flutter Chat",
+  "login": "Login",
+  "register": "Register"
+}
