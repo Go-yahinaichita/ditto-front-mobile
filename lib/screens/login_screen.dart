@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'chat_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
+
+  const LoginScreen({super.key});
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
+  final Color mainColor = Color(0xff0e6666);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.pink[700],
-        elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: Colors.black,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          'Log In',
-          style: TextStyle(color: Colors.white),
-        ),
+        backgroundColor: Colors.white,
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24),
@@ -35,47 +35,40 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              Text(
+                'ログイン',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               TextField(
                 decoration: InputDecoration(
+                  fillColor: Colors.grey[200],
+                  filled: true,
                   hintText: 'Enter your email',
+                  hintStyle: TextStyle(color: Colors.grey[700]),
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.pinkAccent, width: 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.pinkAccent, width: 2.0),
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
                 ),
+                autofocus: true,
               ),
               SizedBox(
                 height: 8,
               ),
               TextField(
                 decoration: InputDecoration(
+                  fillColor: Colors.grey[200],
+                  filled: true,
                   hintText: 'Enter your password',
+                  hintStyle: TextStyle(color: Colors.grey[700]),
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.pinkAccent, width: 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.pinkAccent, width: 2.0),
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
                 ),
               ),
               SizedBox(
@@ -85,8 +78,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: EdgeInsets.symmetric(vertical: 16.0),
                 child: Material(
                   elevation: 5.0,
-                  color: Colors.pink[800],
-                  borderRadius: BorderRadius.circular(30.0),
+                  color: mainColor,
+                  borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
                     onPressed: () {
                       Navigator.pushNamed(context, ChatScreen.id);
@@ -94,9 +87,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     minWidth: 200.0,
                     height: 42.0,
                     child: Text(
-                      'Log In',
+                      'ログイン',
                       style: TextStyle(
                         color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Material(
+                  elevation: 5.0,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5),
+                  child: MaterialButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, RegisterScreen.id);
+                    },
+                    minWidth: 200.0,
+                    height: 42.0,
+                    child: Text(
+                      '新規登録',
+                      style: TextStyle(
+                        color: mainColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

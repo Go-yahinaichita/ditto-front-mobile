@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
 
+  const ChatScreen({super.key});
+
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  ChatScreenState createState() => ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> {
+  final Color mainColor = Color(0xff0e6666);
   bool isLoading = false;
   String currentReply = '';
 
@@ -36,19 +39,20 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: Colors.black,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Show Your AI', style: TextStyle(color: Colors.white)),
+        title: Text('Show Your AI', style: TextStyle(color: mainColor)),
         centerTitle: true,
-        backgroundColor: Colors.pink[700],
+        backgroundColor: Colors.white,
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -56,10 +60,9 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: _messages.isEmpty
-                  ? Container(
-                      child: Column(
+                  ? Column(
                       children: [Spacer()],
-                    ))
+                    )
                   : ListView.builder(
                       itemCount:
                           _messages.length + (currentReply.isNotEmpty ? 1 : 0),
@@ -80,15 +83,15 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                     ),
             ),
-            TextInputWidget(),
+            textInputWidget(),
           ],
         ),
       ),
     );
   }
 
-  Container TextInputWidget() {
-    return Container(
+  SizedBox textInputWidget() {
+    return SizedBox(
       height: 70,
       child: Row(
         children: [
@@ -134,10 +137,10 @@ class ChatBubble extends StatelessWidget {
   final bool isMine;
 
   const ChatBubble({
-    Key? key,
+    super.key,
     required this.text,
     required this.isMine,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +152,7 @@ class ChatBubble extends StatelessWidget {
             : EdgeInsets.fromLTRB(10, 5, 50, 0),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isMine ? Colors.blue[100] : Colors.grey[300],
+          color: isMine ? Color(0xff0e6666) : Colors.grey[300],
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -161,7 +164,7 @@ class ChatBubble extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: 16,
-            color: Colors.black,
+            color: isMine ? Colors.white : Colors.black,
           ),
         ),
       ),
