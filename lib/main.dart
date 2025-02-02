@@ -6,6 +6,7 @@ import 'package:pjt_ditto_front/screens/login_screen.dart';
 import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
+import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Show Your AI',
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        primarySwatch: Colors.teal,
       ),
       initialRoute: WelcomeScreen.id,
       routes: {
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         LoginScreen.id: (context) => LoginScreen(),
         RegisterScreen.id: (context) => RegisterScreen(),
         ChatScreen.id: (context) => ChatScreen(),
+        HistoryScreen.id: (context) => HistoryScreen(),
       },
       locale: const Locale('ja'),
       supportedLocales: const [
