@@ -6,10 +6,11 @@ class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  ChatScreenState createState() => ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> {
+  final Color mainColor = Color(0xff0e6666);
   bool isLoading = false;
   String currentReply = '';
 
@@ -45,13 +46,13 @@ class _ChatScreenState extends State<ChatScreen> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: Colors.black,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Show Your AI', style: TextStyle(color: Colors.white)),
+        title: Text('Show Your AI', style: TextStyle(color: mainColor)),
         centerTitle: true,
-        backgroundColor: Colors.pink[700],
+        backgroundColor: Colors.white,
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -89,8 +90,8 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Container textInputWidget() {
-    return Container(
+  SizedBox textInputWidget() {
+    return SizedBox(
       height: 70,
       child: Row(
         children: [
