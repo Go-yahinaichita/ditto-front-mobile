@@ -33,9 +33,13 @@ flutter:
     #   - images/a_dot_burr.jpeg
     #   - images/a_dot_ham.jpeg
 
-    # fonts:
-    #   - family: Schyler
-    #     fonts:
-    #       - asset: fonts/Schyler-Regular.ttf
-    #       - asset: fonts/Schyler-Italic.ttf
-    #         style: italic
+    fonts:
+        - family: NotoSansJPExtraBold
+          fonts:
+              - asset: fonts/NotoSansJP/NotoSansJP-ExtraBold.ttf
+        - family: NotoSansJPRegular
+          fonts:
+              - asset: fonts/NotoSansJP/NotoSansJP-Regular.ttf
+        - family: NotoSerifJPBold
+          fonts:
+              - asset: fonts/NotoSerifJP/NotoSerifJP-Bold.ttf
