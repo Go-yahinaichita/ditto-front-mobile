@@ -152,7 +152,7 @@ class ChatBubble extends StatelessWidget {
             : EdgeInsets.fromLTRB(10, 5, 50, 0),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isMine ? Colors.blue[100] : Colors.grey[300],
+          color: isMine ? Color(0xff0e6666) : Colors.grey[300],
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -164,7 +164,7 @@ class ChatBubble extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: 16,
-            color: Colors.black,
+            color: isMine ? Colors.white : Colors.black,
           ),
         ),
       ),

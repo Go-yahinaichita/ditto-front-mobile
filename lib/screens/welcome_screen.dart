@@ -33,7 +33,6 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                     color: Colors.white,
                     fontSize: 100,
                     height: 1,
-                    fontWeight: FontWeight.bold,
                     fontFamily: "NotoSansJPExtraBold",
                   ),
                 ),
