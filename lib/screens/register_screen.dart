@@ -3,6 +3,8 @@ import 'chat_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String id = 'Register_screen';
+
+  const RegisterScreen({super.key});
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }

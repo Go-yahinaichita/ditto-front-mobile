@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
 
+  const ChatScreen({super.key});
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -36,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -56,10 +59,9 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: _messages.isEmpty
-                  ? Container(
-                      child: Column(
+                  ? Column(
                       children: [Spacer()],
-                    ))
+                    )
                   : ListView.builder(
                       itemCount:
                           _messages.length + (currentReply.isNotEmpty ? 1 : 0),
@@ -80,14 +82,14 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                     ),
             ),
-            TextInputWidget(),
+            textInputWidget(),
           ],
         ),
       ),
     );
   }
 
-  Container TextInputWidget() {
+  Container textInputWidget() {
     return Container(
       height: 70,
       child: Row(
@@ -134,10 +136,10 @@ class ChatBubble extends StatelessWidget {
   final bool isMine;
 
   const ChatBubble({
-    Key? key,
+    super.key,
     required this.text,
     required this.isMine,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

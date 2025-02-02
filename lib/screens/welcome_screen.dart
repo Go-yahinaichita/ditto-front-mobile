@@ -7,6 +7,8 @@ import 'register_screen.dart';
 class WelcomeScreen extends StatefulWidget {
   static const String id = "welcome_screen";
 
+  const WelcomeScreen({super.key});
+
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
@@ -114,7 +116,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   child: MaterialButton(
                     onPressed: () {
                       Navigator.pushNamed(context, RegisterScreen.id);
-                      print('pushed');
                     },
                     minWidth: 20,
                     height: 42,
