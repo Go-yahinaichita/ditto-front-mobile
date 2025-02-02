@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pjt_ditto_front/screens/register_screen.dart';
-import 'chat_screen.dart';
+import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -82,7 +82,7 @@ class LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, ChatScreen.id);
+                      Navigator.pushNamed(context, HistoryScreen.id);
                     },
                     minWidth: 200.0,
                     height: 42.0,
