@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
+import '../authentication/auth.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -12,6 +13,8 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   final Color mainColor = Color(0xff0e6666);
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +60,7 @@ class LoginScreenState extends State<LoginScreen> {
                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 ),
                 autofocus: true,
+                controller: _emailController,
               ),
               SizedBox(
                 height: 8,
@@ -70,6 +74,7 @@ class LoginScreenState extends State<LoginScreen> {
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 ),
+                controller: _passwordController,
               ),
               SizedBox(
                 height: 24,
@@ -81,8 +86,21 @@ class LoginScreenState extends State<LoginScreen> {
                   color: mainColor,
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, HistoryScreen.id);
+                    onPressed: () async {
+                      bool isSuccess = await signIn(context, _emailController, _passwordController);
+                      if (isSuccess && context.mounted) { // context.mountedをチェック
+                        // ログイン完了メッセージを表示
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('ログインしました'),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                        Navigator.pushNamed(context, HistoryScreen.id);
+                      }
                     },
                     minWidth: 200.0,
                     height: 42.0,

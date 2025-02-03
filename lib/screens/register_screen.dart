@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../firebase_options.dart';
+import '../authentication/auth.dart';
 import 'package:pjt_ditto_front/screens/login_screen.dart';
-import 'chat_screen.dart';
+import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String id = 'Register_screen';
@@ -12,6 +15,8 @@ class RegisterScreen extends StatefulWidget {
 
 class RegisterScreenState extends State<RegisterScreen> {
   final Color mainColor = Color(0xff0e6666);
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +62,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 ),
                 autofocus: true,
+                controller: _emailController,
               ),
               SizedBox(
                 height: 8,
@@ -70,6 +76,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 ),
+                controller: _passwordController,
               ),
               SizedBox(
                 height: 24,
@@ -81,8 +88,21 @@ class RegisterScreenState extends State<RegisterScreen> {
                   color: mainColor,
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, ChatScreen.id);
+                    onPressed: () async {
+                      bool isSuccess = await signUp(context, _emailController, _passwordController);
+                      if (isSuccess && context.mounted) { // context.mountedをチェック
+                        // 登録完了メッセージを表示
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('登録が完了しました'),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                        Navigator.pushNamed(context, HistoryScreen.id);
+                      }
                     },
                     minWidth: 200.0,
                     height: 42.0,
