@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "359175484022",
+    "project_id": "show-your-ai",
+    "storage_bucket": "show-your-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359175484022:android:287807bb4b1ea2c3f1e557",
+        "android_client_info": {
+          "package_name": "com.example.pjt_ditto_front"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359175484022-jv338o3p59midn9bgieuksbe373vi9hp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2CdLzo7zeDZQHaQrrYR5Mv0PrhFrYF6s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "359175484022-jv338o3p59midn9bgieuksbe373vi9hp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "359175484022-mpmearejme6b8shj7ikc2aspgl0uo866.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pjtDittoFront"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

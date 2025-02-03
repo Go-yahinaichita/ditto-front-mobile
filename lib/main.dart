@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:pjt_ditto_front/screens/login_screen.dart';
@@ -9,7 +11,10 @@ import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); // Flutter のバインディングを初期化
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // Firebase を初期化
+  );
   runApp(MyApp());
 }
 
