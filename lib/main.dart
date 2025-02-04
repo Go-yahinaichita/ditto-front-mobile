@@ -9,6 +9,7 @@ import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
+import 'package:pjt_ditto_front/screens/settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Flutter のバインディングを初期化
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         RegisterScreen.id: (context) => RegisterScreen(),
         ChatScreen.id: (context) => ChatScreen(),
         HistoryScreen.id: (context) => HistoryScreen(),
+        SettingsScreen.id: (context) => SettingsScreen(),
       },
       locale: const Locale('ja'),
       supportedLocales: const [

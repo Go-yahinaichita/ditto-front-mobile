@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
+import'package:pjt_ditto_front/screens/settings_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   static const String id = 'history_screen';
@@ -27,10 +28,10 @@ class HistoryScreenState extends State<HistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "History",
           style: TextStyle(
-            color: Color(0xff0e6666),
+            color: mainColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -119,7 +120,7 @@ class HistoryScreenState extends State<HistoryScreen> {
               IconButton(
                 icon: const Icon(Icons.settings, size: 28),
                 onPressed: () {
-                  // 設定画面へ移動
+                  Navigator.pushNamed(context, SettingsScreen.id);
                 },
               ),
             ],
