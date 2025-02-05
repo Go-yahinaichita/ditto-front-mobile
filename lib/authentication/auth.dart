@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:pjt_ditto_front/services/api_service.dart';
 
 class SignInResult {
   final bool success;
@@ -22,28 +21,6 @@ class SignOutResult {
   final String message;
 
   SignOutResult({required this.success, required this.message});
-}
-
-// uidをバックエンドに送信する関数
-Future<void> sendUidToBackend(String uid) async {
-  // TODO: バックエンドのエンドポイントを設定
-  final url = Uri.parse('https://backend-api.com/endpoint');
-  final response = await http.post(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'uid': uid,
-    })
-  );
-
-  if (response.statusCode == 200) {
-    // TODO: バックエンドからのレスポンスを処理
-    print('UID送信成功');
-  } else {
-    print('UID送信失敗: ${response.statusCode}');
-  }
 }
 
 // 新規登録関数
@@ -67,9 +44,11 @@ Future<SignUpResult> signUp(BuildContext context, TextEditingController emailCon
 
     if (user != null) {
       // 新規登録成功時の処理(bodyに付加してバックエンドに送信)
-      // TODO: final String uid = user.uid;
-      // TODO: await sendUidToBackend(uid);
-      return SignUpResult(success: true, message: '登録が完了しました');
+      final String uid = user.uid;
+      if(await sendUidToBackend(uid)) {
+        return SignUpResult(success: true, message: '登録が完了しました');
+      }
+      return SignUpResult(success: false, message: 'データの送信に失敗しました');
     }
     return SignUpResult(success: false, message: '登録に失敗しました');
   } on FirebaseAuthException catch (e) {

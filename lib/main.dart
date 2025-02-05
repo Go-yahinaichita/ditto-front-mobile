@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:pjt_ditto_front/screens/login_screen.dart';
@@ -16,6 +17,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform, // Firebase を初期化
   );
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
