@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 import '../authentication/auth.dart';
 import 'package:pjt_ditto_front/screens/login_screen.dart';
-import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String id = 'Register_screen';
@@ -89,19 +86,34 @@ class RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
                     onPressed: () async {
-                      bool isSuccess = await signUp(context, _emailController, _passwordController);
-                      if (isSuccess && context.mounted) { // context.mountedをチェック
+                      SignUpResult result = await signUp(context, _emailController, _passwordController);
+                      if (result.success && context.mounted) { // context.mountedをチェック
                         // 登録完了メッセージを表示
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('登録が完了しました'),
+                              content: Text(result.message),
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
                         }
-                        Navigator.pushNamed(context, HistoryScreen.id);
+                        Navigator.pushAndRemoveUntil(
+                          context, 
+                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                          (Route<dynamic> route) => false,
+                        );
+                      } else {
+                        // 登録失敗メッセージを表示
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result.message),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
                       }
                     },
                     minWidth: 200.0,

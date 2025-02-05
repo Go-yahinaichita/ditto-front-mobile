@@ -3,6 +3,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+class SignInResult {
+  final bool success;
+  final String message;
+
+  SignInResult({required this.success, required this.message});
+}
+
+class SignUpResult {
+  final bool success;
+  final String message;
+
+  SignUpResult({required this.success, required this.message});
+}
+
+class SignOutResult {
+  final bool success;
+  final String message;
+
+  SignOutResult({required this.success, required this.message});
+}
+
 // uidをバックエンドに送信する関数
 Future<void> sendUidToBackend(String uid) async {
   // TODO: バックエンドのエンドポイントを設定
@@ -26,9 +47,16 @@ Future<void> sendUidToBackend(String uid) async {
 }
 
 // 新規登録関数
-Future<bool> signUp(BuildContext context, TextEditingController emailController,
+Future<SignUpResult> signUp(BuildContext context, TextEditingController emailController,
     TextEditingController passwordController) async {
   try {
+    // メールアドレスとパスワードのnullチェック
+    if (emailController.text.isEmpty) {
+      return SignUpResult(success: false, message: 'メールアドレスを入力してください。');
+    } else if (passwordController.text.isEmpty) {
+      return SignUpResult(success: false, message: 'パスワードを入力してください。');
+    }
+
     final UserCredential userCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
@@ -41,9 +69,9 @@ Future<bool> signUp(BuildContext context, TextEditingController emailController,
       // 新規登録成功時の処理(bodyに付加してバックエンドに送信)
       // TODO: final String uid = user.uid;
       // TODO: await sendUidToBackend(uid);
-      return true;
+      return SignUpResult(success: true, message: '登録が完了しました');
     }
-    return false;
+    return SignUpResult(success: false, message: '登録に失敗しました');
   } on FirebaseAuthException catch (e) {
     String errorMessage;
     switch (e.code) {
@@ -62,52 +90,24 @@ Future<bool> signUp(BuildContext context, TextEditingController emailController,
       default:
         errorMessage = '新規登録に失敗しました: ${e.message}';
     }
-    // ユーザーにエラーを表示
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('エラー'),
-          content: Text(errorMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-    return false;
+    return SignUpResult(success: false, message: errorMessage);
   } catch (e) {
-    // 予期しないエラーの詳細を出力
-    print('Unexpected Error: $e');
-
-
     // 予期しないエラー
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('エラー'),
-          content: Text('予期しないエラーが発生しました。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-    return false;
+    return SignUpResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
 }
 
 // ログイン関数
-Future<bool> signIn(BuildContext context, TextEditingController emailController, 
+Future<SignInResult> signIn(BuildContext context, TextEditingController emailController, 
     TextEditingController passwordController) async {
   try {
+    // メールアドレスとパスワードのnullチェック
+    if (emailController.text.isEmpty) {
+      return SignInResult(success: false, message: 'メールアドレスを入力してください。');
+    } else if (passwordController.text.isEmpty) {
+      return SignInResult(success: false, message: 'パスワードを入力してください。');
+    }
+
     final UserCredential userCredential = 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -120,9 +120,9 @@ Future<bool> signIn(BuildContext context, TextEditingController emailController,
       // ログイン成功時の処理(bodyに付加してバックエンドに送信)
       // TODO: final String uid = user.uid;
       // TODO: await sendUidToBackend(uid);
-      return true;
+      return SignInResult(success: true, message: 'ログインしました');
     }
-    return false;
+    return SignInResult(success: false, message: 'ログインに失敗しました');
   } on FirebaseAuthException catch (e) {
     String errorMessage;
     switch (e.code) {
@@ -144,41 +144,18 @@ Future<bool> signIn(BuildContext context, TextEditingController emailController,
       default:
         errorMessage = 'ログインに失敗しました: ${e.message}';
     }
-
-    // ユーザーにエラーメッセージを表示
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('ログインエラー'),
-          content: Text(errorMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-    return false;
+    return SignInResult(success: false, message: errorMessage);
   } catch (e) {
     // 予期しないエラー
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('エラー'),
-          content: Text('予期しないエラーが発生しました。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-    return false;
+    return SignInResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
+}
+
+// ログアウト関数
+Future<SignOutResult> signOut() async {
+  await FirebaseAuth.instance.signOut();
+  if (FirebaseAuth.instance.currentUser == null) {
+    return SignOutResult(success: true, message: 'ログアウトしました');
+  }
+  return SignOutResult(success: false, message: 'ログアウトに失敗しました');
 }

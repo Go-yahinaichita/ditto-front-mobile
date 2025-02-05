@@ -87,19 +87,34 @@ class LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
                     onPressed: () async {
-                      bool isSuccess = await signIn(context, _emailController, _passwordController);
-                      if (isSuccess && context.mounted) { // context.mountedをチェック
+                      SignInResult result = await signIn(context, _emailController, _passwordController);
+                      if (result.success && context.mounted) { // context.mountedをチェック
                         // ログイン完了メッセージを表示
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('ログインしました'),
+                              content: Text(result.message),
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
                         }
-                        Navigator.pushNamed(context, HistoryScreen.id);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => HistoryScreen()),
+                          (Route<dynamic> route) => false,
+                        );
+                      } else {
+                        // ログイン失敗メッセージを表示
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result.message),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
                       }
                     },
                     minWidth: 200.0,
