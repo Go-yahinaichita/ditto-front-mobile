@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
-import'package:pjt_ditto_front/screens/settings_screen.dart';
+import 'package:pjt_ditto_front/screens/settings_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   static const String id = 'history_screen';
@@ -52,7 +53,7 @@ class HistoryScreenState extends State<HistoryScreen> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             onTap: () {
-              Navigator.pushNamed(context, ChatScreen.id);
+              Navigator.pushNamed(context, NewChatSetupScreen.id);
             },
           ),
           const Divider(),
@@ -106,7 +107,7 @@ class HistoryScreenState extends State<HistoryScreen> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pushNamed(context, ChatScreen.id);
+                  Navigator.pushNamed(context, NewChatSetupScreen.id);
                 },
                 icon: const Icon(Icons.add, color: Colors.white),
                 label: const Text("New Chat"),
