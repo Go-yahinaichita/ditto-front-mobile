@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 import '../authentication/auth.dart';
@@ -87,8 +88,10 @@ class LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
                     onPressed: () async {
-                      SignInResult result = await signIn(context, _emailController, _passwordController);
-                      if (result.success && context.mounted) { // context.mountedをチェック
+                      SignInResult result = await signIn(
+                          context, _emailController, _passwordController);
+                      if (result.success && context.mounted) {
+                        // context.mountedをチェック
                         // ログイン完了メッセージを表示
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -99,11 +102,18 @@ class LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                         }
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => HistoryScreen()),
-                          (Route<dynamic> route) => false,
-                        );
+
+                        final User? user = FirebaseAuth.instance.currentUser;
+                        if (user != null) {
+                          String uid = user.uid;
+                          debugPrint("Uid: $uid");
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HistoryScreen()),
+                            (Route<dynamic> route) => false,
+                          );
+                        }
                       } else {
                         // ログイン失敗メッセージを表示
                         if (context.mounted) {

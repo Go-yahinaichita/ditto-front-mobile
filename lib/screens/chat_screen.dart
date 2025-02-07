@@ -1,28 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
 
-  final String name;
-  final String age;
-  final String occupation;
-  final String experience;
-  final String skills;
-  final String constraints;
-  final String values;
-  final String goals;
-
-  const ChatScreen({
-    super.key,
-    required this.name,
-    required this.age,
-    required this.occupation,
-    required this.experience,
-    required this.skills,
-    required this.constraints,
-    required this.values,
-    required this.goals,
-  });
+  const ChatScreen({super.key});
 
   @override
   ChatScreenState createState() => ChatScreenState();
@@ -32,27 +15,53 @@ class ChatScreenState extends State<ChatScreen> {
   final Color mainColor = Color(0xff0e6666);
   bool isLoading = false;
   String currentReply = '';
+  final TextEditingController _controller = TextEditingController();
+
+  final List<Map<String, dynamic>> _messages = [];
 
   @override
   void initState() {
     super.initState();
   }
 
-  final List<Map<String, dynamic>> _messages = [
-    {
-      'text': 'Hello, how are you?',
-      'isMine': false,
-    },
-  ];
-  final TextEditingController _controller = TextEditingController();
+  Future<void> _sendMessageToServer(String message) async {
+    const String apiUrl =
+        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/conversations/";
+
+    final Map<String, String> messageData = {
+      'message': message,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(messageData),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        setState(() {
+          currentReply = responseData['reply'] ?? "No response";
+          _messages.insert(0, {'text': message, 'isMine': true});
+        });
+      } else {
+        debugPrint("メッセージ送信失敗: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("error: $e");
+    }
+  }
 
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
       setState(() {
         isLoading = true;
-        _messages.insert(0, {'text': text, 'isMine': true});
       });
+
+      _sendMessageToServer(text);
+
       _controller.clear();
       FocusScope.of(context).unfocus();
     }
