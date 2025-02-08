@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:pjt_ditto_front/screens/login_screen.dart';
@@ -11,13 +10,14 @@ import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 import 'package:pjt_ditto_front/screens/settings_screen.dart';
+import 'package:pjt_ditto_front/screens/change_password_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Flutter のバインディングを初期化
+  //await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform, // Firebase を初期化
   );
-  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
         ChatScreen.id: (context) => ChatScreen(),
         HistoryScreen.id: (context) => HistoryScreen(),
         SettingsScreen.id: (context) => SettingsScreen(),
+        ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
       },
       locale: const Locale('ja'),
       supportedLocales: const [
