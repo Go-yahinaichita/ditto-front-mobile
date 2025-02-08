@@ -3,7 +3,26 @@ import 'package:flutter/material.dart';
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
 
-  const ChatScreen({super.key});
+  final String name;
+  final String age;
+  final String occupation;
+  final String experience;
+  final String skills;
+  final String constraints;
+  final String values;
+  final String goals;
+
+  const ChatScreen({
+    super.key,
+    required this.name,
+    required this.age,
+    required this.occupation,
+    required this.experience,
+    required this.skills,
+    required this.constraints,
+    required this.values,
+    required this.goals,
+  });
 
   @override
   ChatScreenState createState() => ChatScreenState();
