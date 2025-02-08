@@ -86,7 +86,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(5),
                   child: MaterialButton(
                     onPressed: () async {
-                      SignUpResult result = await signUp(context, _emailController, _passwordController);
+                      AuthResult result = await signUp(context, _emailController, _passwordController);
                       if (result.success && context.mounted) { // context.mountedをチェック
                         // 登録完了メッセージを表示
                         if (context.mounted) {

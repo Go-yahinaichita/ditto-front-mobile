@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pjt_ditto_front/services/api_service.dart';
+// import 'package:pjt_ditto_front/services/api_service.dart';
 
-class SignInResult {
+class AuthResult {
   final bool success;
   final String message;
 
-  SignInResult({required this.success, required this.message});
-}
-
-class SignUpResult {
-  final bool success;
-  final String message;
-
-  SignUpResult({required this.success, required this.message});
-}
-
-class SignOutResult {
-  final bool success;
-  final String message;
-
-  SignOutResult({required this.success, required this.message});
+  AuthResult({required this.success, required this.message});
 }
 
 // 新規登録関数
-Future<SignUpResult> signUp(BuildContext context, TextEditingController emailController,
+Future<AuthResult> signUp(BuildContext context, TextEditingController emailController,
     TextEditingController passwordController) async {
   try {
     // メールアドレスとパスワードのnullチェック
     if (emailController.text.isEmpty) {
-      return SignUpResult(success: false, message: 'メールアドレスを入力してください。');
+      return AuthResult(success: false, message: 'メールアドレスを入力してください。');
     } else if (passwordController.text.isEmpty) {
-      return SignUpResult(success: false, message: 'パスワードを入力してください。');
+      return AuthResult(success: false, message: 'パスワードを入力してください。');
     }
 
     final UserCredential userCredential =
@@ -44,13 +30,15 @@ Future<SignUpResult> signUp(BuildContext context, TextEditingController emailCon
 
     if (user != null) {
       // 新規登録成功時の処理(bodyに付加してバックエンドに送信)
-      final String uid = user.uid;
-      if(await sendUidToBackend(uid)) {
-        return SignUpResult(success: true, message: '登録が完了しました');
-      }
-      return SignUpResult(success: false, message: 'データの送信に失敗しました');
+      await user.sendEmailVerification();
+      return AuthResult(success: true, message: '確認メールを送信しました');
+      // final String uid = user.uid;
+      // if(await sendUidToBackend(uid)) {
+      //   return SignUpResult(success: true, message: '登録が完了しました');
+      // }
+      // return SignUpResult(success: false, message: 'データの送信に失敗しました');
     }
-    return SignUpResult(success: false, message: '登録に失敗しました');
+    return AuthResult(success: false, message: '登録に失敗しました');
   } on FirebaseAuthException catch (e) {
     String errorMessage;
     switch (e.code) {
@@ -69,22 +57,22 @@ Future<SignUpResult> signUp(BuildContext context, TextEditingController emailCon
       default:
         errorMessage = '新規登録に失敗しました: ${e.message}';
     }
-    return SignUpResult(success: false, message: errorMessage);
+    return AuthResult(success: false, message: errorMessage);
   } catch (e) {
     // 予期しないエラー
-    return SignUpResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
+    return AuthResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
 }
 
 // ログイン関数
-Future<SignInResult> signIn(BuildContext context, TextEditingController emailController, 
+Future<AuthResult> signIn(BuildContext context, TextEditingController emailController, 
     TextEditingController passwordController) async {
   try {
     // メールアドレスとパスワードのnullチェック
     if (emailController.text.isEmpty) {
-      return SignInResult(success: false, message: 'メールアドレスを入力してください。');
+      return AuthResult(success: false, message: 'メールアドレスを入力してください。');
     } else if (passwordController.text.isEmpty) {
-      return SignInResult(success: false, message: 'パスワードを入力してください。');
+      return AuthResult(success: false, message: 'パスワードを入力してください。');
     }
 
     final UserCredential userCredential = 
@@ -95,13 +83,13 @@ Future<SignInResult> signIn(BuildContext context, TextEditingController emailCon
 
     final User? user = userCredential.user;
 
-    if (user != null) {
+    if (user != null && user.emailVerified) {
       // ログイン成功時の処理(bodyに付加してバックエンドに送信)
       // TODO: final String uid = user.uid;
       // TODO: await sendUidToBackend(uid);
-      return SignInResult(success: true, message: 'ログインしました');
+      return AuthResult(success: true, message: 'ログインしました');
     }
-    return SignInResult(success: false, message: 'ログインに失敗しました');
+    return AuthResult(success: false, message: 'メールアドレスが確認されていません');
   } on FirebaseAuthException catch (e) {
     String errorMessage;
     switch (e.code) {
@@ -123,18 +111,51 @@ Future<SignInResult> signIn(BuildContext context, TextEditingController emailCon
       default:
         errorMessage = 'ログインに失敗しました: ${e.message}';
     }
-    return SignInResult(success: false, message: errorMessage);
+    return AuthResult(success: false, message: errorMessage);
   } catch (e) {
     // 予期しないエラー
-    return SignInResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
+    return AuthResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
 }
 
 // ログアウト関数
-Future<SignOutResult> signOut() async {
+Future<AuthResult> signOut() async {
   await FirebaseAuth.instance.signOut();
   if (FirebaseAuth.instance.currentUser == null) {
-    return SignOutResult(success: true, message: 'ログアウトしました');
+    return AuthResult(success: true, message: 'ログアウトしました');
   }
-  return SignOutResult(success: false, message: 'ログアウトに失敗しました');
+  return AuthResult(success: false, message: 'ログアウトに失敗しました');
+}
+
+// パスワードリセット関数
+Future<String> resetPassword(BuildContext context, TextEditingController emailController) async {
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+    return 'パスワードリセットメールを送信しました';
+  } catch (e) {
+    return 'パスワードリセットに失敗しました: $e';
+  }
+}
+
+// パスワード変更関数
+Future<AuthResult> updatePassword(BuildContext context, TextEditingController passwordController) async {
+  try {
+    await FirebaseAuth.instance.currentUser?.updatePassword(passwordController.text.trim());
+    return AuthResult(success: true, message: 'パスワードを変更しました');
+  } on FirebaseAuthException catch (e) {
+    String errorMessage;
+    switch (e.code) {
+      case 'weak-password':
+        errorMessage = 'パスワードが脆弱すぎます。';
+        break;
+      case 'requires-recent-login':
+        errorMessage = '再ログインが必要です。';
+        break;
+      default:
+        errorMessage = 'パスワード変更に失敗しました: ${e.message}';
+    }
+    return AuthResult(success: false, message: errorMessage);
+  } catch (e) {
+    return AuthResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
+  }
 }
