@@ -10,6 +10,7 @@ import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 import 'package:pjt_ditto_front/screens/settings_screen.dart';
+import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
 import 'package:pjt_ditto_front/screens/change_password_screen.dart';
 
 void main() async {
@@ -32,14 +33,42 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
       ),
       initialRoute: WelcomeScreen.id,
-      routes: {
-        WelcomeScreen.id: (context) => WelcomeScreen(),
-        LoginScreen.id: (context) => LoginScreen(),
-        RegisterScreen.id: (context) => RegisterScreen(),
-        ChatScreen.id: (context) => ChatScreen(),
-        HistoryScreen.id: (context) => HistoryScreen(),
-        SettingsScreen.id: (context) => SettingsScreen(),
-        ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case WelcomeScreen.id:
+            return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+          case LoginScreen.id:
+            return MaterialPageRoute(builder: (_) => const LoginScreen());
+          case RegisterScreen.id:
+            return MaterialPageRoute(builder: (_) => const RegisterScreen());
+          case HistoryScreen.id:
+            return MaterialPageRoute(builder: (_) => const HistoryScreen());
+          case SettingsScreen.id:
+            return MaterialPageRoute(builder: (_) => const SettingsScreen());
+          case NewChatSetupScreen.id:
+            return MaterialPageRoute(builder: (_) => const NewChatSetupScreen());
+          case ChangePasswordScreen.id: 
+            return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+          case ChatScreen.id:
+            if (settings.arguments is Map<String, String>) {
+              final args = settings.arguments as Map<String, String>;
+              return MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  name: args['name'] ?? '',
+                  age: args['age'] ?? '',
+                  occupation: args['occupation'] ?? '',
+                  experience: args['experience'] ?? '',
+                  skills: args['skills'] ?? '',
+                  constraints: args['constraints'] ?? '',
+                  values: args['values'] ?? '',
+                  goals: args['goals'] ?? '',
+                ),
+              );
+            }
+            return null;
+          default:
+            return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+        }
       },
       locale: const Locale('ja'),
       supportedLocales: const [
