@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 import '../authentication/auth.dart';
@@ -118,6 +119,20 @@ class LoginScreenState extends State<LoginScreen> {
                             );
                           }
                         }
+
+                        if (result.success) {
+                          final User? user = FirebaseAuth.instance.currentUser;
+                          if (user != null) {
+                            debugPrint("Uid: ${user.uid}");
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HistoryScreen()),
+                              (Route<dynamic> route) => false,
+                            );
+                          }
+                        }
+
                       },
                       minWidth: 200.0,
                       height: 42.0,

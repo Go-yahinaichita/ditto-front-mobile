@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pjt_ditto_front/provider/user_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
@@ -13,20 +17,51 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
+  List<Map<String, dynamic>> chatHistory = [];
+
   static const String id = 'history_screen';
   final Color mainColor = Color(0xff0e6666);
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> chatHistory = List.generate(20, (index) {
-      return {
-        'title': '歯医者',
-        'subtitle': '10年後のあなたは...',
-        'date': '1/26',
-        'time': '12:05'
-      };
-    });
+  void initState() {
+    super.initState();
+    _fetchChatHistory();
+  }
 
+  Future<void> _fetchChatHistory() async {
+    final String? uid = Provider.of<UserProvider>(context, listen: false).uid;
+    if (uid == null) {
+      debugPrint("No uid");
+      return;
+    }
+    String apiUrl =
+        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid";
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      debugPrint("Response $response ${response.headers}");
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          chatHistory = data
+              .map((chat) => {
+                    'id': chat['id'] ?? 0,
+                    'title': chat['title'] ?? "No title",
+                    'created_at': chat['created_at'] ?? "xx/xx",
+                    'updated_at': chat['updated_at'] ?? "xx:xx",
+                  })
+              .toList();
+        });
+      }
+    } catch (e) {
+      debugPrint("error: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -65,24 +100,28 @@ class HistoryScreenState extends State<HistoryScreen> {
                 children: chatHistory.map((chat) {
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: Colors.white,
                     ),
                     title: Text(chat['title']!,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(chat['subtitle']!),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(chat['date']!,
+                        Text(chat['created_at']!,
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.black54)),
-                        Text(chat['time']!,
+                        Text(chat['updated_at']!,
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.black54)),
                       ],
                     ),
                     onTap: () {
-                      Navigator.pushNamed(context, ChatScreen.id);
+                      Navigator.pushNamed(context, ChatScreen.id, arguments: {
+                        'id': chat['id'],
+                        'title': chat['title'],
+                        'created_at': chat['created_at'],
+                        'updated_at': chat['updated_at']
+                      });
                     },
                   );
                 }).toList(),
