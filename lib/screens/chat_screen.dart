@@ -34,11 +34,13 @@ class ChatScreenState extends State<ChatScreen> {
 
   Future<void> _sendMessageToServer(String message) async {
     String apiUrl =
-        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/conversations/${widget.chatId}";
+        "https://ditto-back-feature-1025173260301.asia-northeast1.run.app/api/agents/conversations/${widget.chatId}";
 
     final Map<String, String> messageData = {
       'message': message,
     };
+
+    debugPrint("MessageData ${jsonEncode(messageData)}");
 
     try {
       final response = await http.post(
@@ -47,17 +49,27 @@ class ChatScreenState extends State<ChatScreen> {
         body: jsonEncode(messageData),
       );
 
+      debugPrint("Resopnse ${response.body}");
+      debugPrint("Message: $messageData");
+
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
+        final responseData = response.body;
         setState(() {
-          currentReply = responseData['reply'] ?? "No response";
           _messages.insert(0, {'text': message, 'isMine': true});
+
+          _messages.insert(0, {'text': responseData, 'isMine': false});
+
+          isLoading = false;
         });
       } else {
-        debugPrint("メッセージ送信失敗: ${response.statusCode}");
+        debugPrint(
+            "メッセージ送信失敗: $messageData ${response.statusCode} ${response.request} ${response.headers}");
       }
     } catch (e) {
       debugPrint("error: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
