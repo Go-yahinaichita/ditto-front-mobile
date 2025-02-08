@@ -48,7 +48,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
     final String? uid = Provider.of<UserProvider>(context).uid;
     debugPrint("UID: $uid");
 
-    Future<bool> sendUserInfoToServer(String uid) async {
+    Future<Map<String, dynamic>?> sendUserInfoToServer(String uid) async {
       String apiUrl =
           'https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid';
 
@@ -56,11 +56,10 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
         // 'name': _nameController.text.trim(),
         'age': int.tryParse(_ageController.text.trim()) ?? 20,
         'status': _statusController.text.trim(),
-        'skills': _skillsController.text
-            .trim()
-            .split(',')
-            .map((s) => s.trim())
-            .toList(), //List
+        'skills': [
+          ..._skillsController.text.trim().split(',').map((s) => s.trim()),
+          _experienceController.text.trim()
+        ], //List
         'values': _valuesController.text.trim(),
         'restrictions': _restrictionsController.text.trim(),
         'future_goals': _goalsController.text
@@ -71,6 +70,15 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
         'experience': _experienceController.text.trim(),
         'extra': "some extra info",
       };
+
+      // final Map<String, dynamic> userInfo = {
+      //   'age': 20,
+      //   'status': '学生',
+      //   'skills': ['応用情報技術者試験', '自動車免許'],
+      //   'values': 'レスイズモア',
+      //   'restrictions': 'インターンで忙しい',
+      //   'future_goals': ['コンサルタント', 'お金持ち'],
+      // };
 
       try {
         final response = await http.post(
@@ -83,14 +91,17 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
 
         if (response.statusCode == 200) {
           debugPrint("ユーザー情報送信成功：${response.body}");
-          return true;
+          final responseData = jsonDecode(response.body);
+
+          return responseData;
         } else {
-          debugPrint("ユーザー情報送信失敗： ${response.statusCode}");
-          return false;
+          debugPrint(
+              "ユーザー情報送信失敗： ${response.statusCode} ${response.request} ${response.headers} ${userInfo} ");
+          return null;
         }
       } catch (e) {
         debugPrint("エラー: $e");
-        return false;
+        return null;
       }
     }
 
@@ -163,18 +174,16 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
                       return;
                     }
 
-                    if (!mounted) return;
+                    final chatData = await sendUserInfoToServer(uid);
+                    debugPrint("Success $chatData");
 
-                    bool success = await sendUserInfoToServer(uid);
-                    debugPrint("Success $success");
-
-                    if (!mounted) return;
-
-                    if (success) {
-                      if (!mounted) return;
-                      Navigator.pushNamed(context, ChatScreen.id);
+                    if (chatData != null && mounted) {
+                      Navigator.pushNamed(
+                        context,
+                        ChatScreen.id,
+                        arguments: chatData,
+                      );
                     } else {
-                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("チャットの作成に失敗しました。")),
                       );

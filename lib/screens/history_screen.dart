@@ -35,10 +35,12 @@ class HistoryScreenState extends State<HistoryScreen> {
       return;
     }
     String apiUrl =
-        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/conversations/$uid";
+        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
+
+      debugPrint("Response $response ${response.headers}");
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -98,11 +100,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                 children: chatHistory.map((chat) {
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: Colors.white,
                     ),
                     title: Text(chat['title']!,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(chat['subtitle']!),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -115,7 +116,12 @@ class HistoryScreenState extends State<HistoryScreen> {
                       ],
                     ),
                     onTap: () {
-                      Navigator.pushNamed(context, ChatScreen.id);
+                      Navigator.pushNamed(context, ChatScreen.id, arguments: {
+                        'id': chat['id'],
+                        'title': chat['title'],
+                        'created_at': chat['created_at'],
+                        'updated_at': chat['updated_at']
+                      });
                     },
                   );
                 }).toList(),

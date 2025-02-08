@@ -5,7 +5,16 @@ import 'dart:convert';
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
 
-  const ChatScreen({super.key});
+  final int chatId;
+  final String title;
+  final DateTime createdAt;
+
+  const ChatScreen({
+    super.key,
+    required this.chatId,
+    required this.title,
+    required this.createdAt,
+  });
 
   @override
   ChatScreenState createState() => ChatScreenState();
@@ -16,7 +25,6 @@ class ChatScreenState extends State<ChatScreen> {
   bool isLoading = false;
   String currentReply = '';
   final TextEditingController _controller = TextEditingController();
-
   final List<Map<String, dynamic>> _messages = [];
 
   @override
@@ -25,8 +33,8 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _sendMessageToServer(String message) async {
-    const String apiUrl =
-        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/conversations/";
+    String apiUrl =
+        "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/conversations/${widget.chatId}";
 
     final Map<String, String> messageData = {
       'message': message,
@@ -78,7 +86,7 @@ class ChatScreenState extends State<ChatScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Show Your AI', style: TextStyle(color: mainColor)),
+        title: Text(widget.title, style: TextStyle(color: mainColor)),
         centerTitle: true,
         backgroundColor: Colors.white,
       ),

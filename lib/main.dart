@@ -60,7 +60,19 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
                 builder: (_) => const NewChatSetupScreen());
           case ChatScreen.id:
-            return MaterialPageRoute(builder: (_) => const ChatScreen());
+            if (settings.arguments is Map<String, dynamic>) {
+              final chatData = settings.arguments as Map<String, dynamic>;
+              return MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  chatId: chatData['id'] ?? 0,
+                  title: chatData['title'] ?? "No title",
+                  createdAt: DateTime.tryParse(chatData['created_at'] ?? "") ??
+                      DateTime.now(),
+                ),
+              );
+            } else {
+              return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+            }
           default:
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
         }
