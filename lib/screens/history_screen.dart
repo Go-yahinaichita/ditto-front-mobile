@@ -19,42 +19,35 @@ class HistoryScreen extends StatefulWidget {
 
 class HistoryScreenState extends State<HistoryScreen> {
   List<Map<String, dynamic>> chatHistory = [];
-
-  static const String id = 'history_screen';
   final Color mainColor = Color(0xff0e6666);
   bool _isLoading = true;
-  String? uid = "";
-
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    uid ??= Provider.of<UserProvider>(context, listen: false).uid;
-    if (uid != null) {
-      _fetchChatHistory();
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
+  String? uid;
 
   @override
   void initState() {
     super.initState();
+    Future.microtask(() {
+      setState(() {
+        uid = Provider.of<UserProvider>(context, listen: false).uid;
+      });
+      if (uid != null) {
+        _fetchChatHistory();
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   Future<void> _fetchChatHistory() async {
-    final String? uid = Provider.of<UserProvider>(context, listen: false).uid;
-    if (uid == null) {
-      debugPrint("No uid");
-      return;
-    }
+    if (uid == null) return;
+
     String apiUrl =
         "https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
-
-      debugPrint("Response $response ${response.headers}");
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -67,12 +60,18 @@ class HistoryScreenState extends State<HistoryScreen> {
                     'updated_at': chat['updated_at'] ?? "xx:xx",
                   })
               .toList();
+          _isLoading = false;
         });
-        _isLoading = false;
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
       debugPrint("error: $e");
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -83,7 +82,7 @@ class HistoryScreenState extends State<HistoryScreen> {
       appBar: AppBar(
         title: Text(
           "History",
-          style: TextStyle(
+          style: const TextStyle(
             color: Color(0xff0A4D4D),
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -112,46 +111,46 @@ class HistoryScreenState extends State<HistoryScreen> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    child: Column(
-                      children: chatHistory.map((chat) {
-                        return ListTile(
-                          tileColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 20),
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[300],
-                          ),
-                          title: Text(chat['title']!,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                  DateFormat('MM/dd').format(
-                                      DateTime.parse(chat['updated_at']!)),
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.black54)),
-                              Text(
-                                  DateFormat('HH:mm').format(
-                                      DateTime.parse(chat['updated_at']!)),
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.black54)),
-                            ],
-                          ),
-                          onTap: () {
-                            Navigator.pushNamed(context, ChatScreen.id,
-                                arguments: {
-                                  'id': chat['id'],
-                                  'title': chat['title'],
-                                  'created_at': chat['created_at'],
-                                  'updated_at': chat['updated_at']
-                                });
-                          },
-                        );
-                      }).toList(),
-                    ),
+                : ListView.builder(
+                    itemCount: chatHistory.length,
+                    itemBuilder: (context, index) {
+                      final chat = chatHistory[index];
+                      return ListTile(
+                        tileColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 20),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.grey[300],
+                        ),
+                        title: Text(chat['title']!,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                                DateFormat('MM/dd').format(
+                                    DateTime.parse(chat['updated_at']!)),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54)),
+                            Text(
+                                DateFormat('HH:mm').format(
+                                    DateTime.parse(chat['updated_at']!)),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54)),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, ChatScreen.id,
+                              arguments: {
+                                'id': chat['id'],
+                                'title': chat['title'],
+                                'created_at': chat['created_at'],
+                                'updated_at': chat['updated_at']
+                              });
+                        },
+                      );
+                    },
                   ),
           ),
         ],

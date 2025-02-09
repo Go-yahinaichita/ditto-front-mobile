@@ -148,6 +148,7 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -162,7 +163,6 @@ class ChatScreenState extends State<ChatScreen> {
           centerTitle: true,
           backgroundColor: Colors.white,
         ),
-        drawer: Drawer(),
         body: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Column(
