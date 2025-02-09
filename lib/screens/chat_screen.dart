@@ -52,7 +52,7 @@ class ChatScreenState extends State<ChatScreen> {
               .map((message) => {
                     "id": message["id"],
                     "role": message["role"],
-                    "message": message["message"],
+                    "message": message["message"].trim(),
                     "created_at": message["created_at"],
                   })
               .toList();
@@ -78,6 +78,14 @@ class ChatScreenState extends State<ChatScreen> {
       'message': message,
     };
 
+    setState(() {
+      _messages.insert(0, {
+        "role": "user",
+        "message": message.trim(),
+        "created_at": DateTime.now().toIso8601String(),
+      });
+    });
+
     debugPrint("MessageData ${jsonEncode(messageData)}");
 
     try {
@@ -94,14 +102,8 @@ class ChatScreenState extends State<ChatScreen> {
         final responseText = response.body;
         setState(() {
           _messages.insert(0, {
-            "role": "user",
-            "message": message,
-            "created_at": DateTime.now().toIso8601String(),
-          });
-
-          _messages.insert(0, {
             "role": "agent",
-            "message": responseText,
+            "message": responseText.trim(),
             "created_at": DateTime.now().toIso8601String(),
           });
 
@@ -144,42 +146,47 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(widget.title, style: TextStyle(color: mainColor)),
-        centerTitle: true,
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: Colors.white,
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: [
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _messages.isEmpty
-                      ? const Center(child: Text("メッセージ履歴なし"))
-                      : ListView.builder(
-                          itemCount: _messages.length,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            final message = _messages[index];
-                            return ChatBubble(
-                              text: message['message'] ?? '',
-                              isUser: message['role'] == 'user',
-                            );
-                          },
-                        ),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.black,
             ),
-            textInputWidget(),
-          ],
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(widget.title,
+              style: TextStyle(
+                  color: Color(0xff0a4d4d), fontWeight: FontWeight.bold)),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+        ),
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: [
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _messages.isEmpty
+                        ? const Center(child: Text("メッセージ履歴なし"))
+                        : ListView.builder(
+                            itemCount: _messages.length,
+                            reverse: true,
+                            itemBuilder: (context, index) {
+                              final message = _messages[index];
+                              return ChatBubble(
+                                text: message['message'] ?? '',
+                                isUser: message['role'] == 'user',
+                              );
+                            },
+                          ),
+              ),
+              textInputWidget(),
+            ],
+          ),
         ),
       ),
     );

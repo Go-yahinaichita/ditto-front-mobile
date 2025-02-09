@@ -1,8 +1,7 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 import 'package:pjt_ditto_front/authentication/auth.dart';
+import 'package:pjt_ditto_front/components/custom_text_field.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   static const String id = 'change_password_screen';
@@ -13,7 +12,7 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class ChangePasswordScreenState extends State<ChangePasswordScreen> {
-    final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final Color mainColor = Color(0xff0e6666);
   @override
   Widget build(BuildContext context) {
@@ -28,8 +27,7 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         ),
       ),
-      body: 
-      Padding(
+      body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -50,17 +48,10 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextField(
-                    decoration: InputDecoration(
-                      fillColor: Colors.grey[200],
-                      filled: true,
+                  CustomTextField(
+                      controller: _passwordController,
                       hintText: 'Enter your new password',
-                      hintStyle: TextStyle(color: Colors.grey[700]),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    ),
-                    controller: _passwordController,
-                  ),
+                      obscureText: true),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     child: Material(
@@ -69,7 +60,8 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       borderRadius: BorderRadius.circular(5),
                       child: MaterialButton(
                         onPressed: () async {
-                          AuthResult result = await updatePassword(context, _passwordController);
+                          AuthResult result = await updatePassword(
+                              context, _passwordController);
                           if (result.success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -80,7 +72,8 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             );
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => HistoryScreen()),
+                              MaterialPageRoute(
+                                  builder: (context) => HistoryScreen()),
                               (Route<dynamic> route) => false,
                             );
                           } else {
@@ -106,12 +99,12 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
                   ),
-                ]
+                ],
               ),
             )
-          ]
-        )
-      )
+          ],
+        ),
+      ),
     );
   }
 }

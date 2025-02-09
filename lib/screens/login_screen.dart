@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../authentication/auth.dart';
 import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
-import '../authentication/auth.dart';
+import 'package:pjt_ditto_front/components/custom_text_field.dart';
+import 'package:pjt_ditto_front/components/primary_button.dart';
+import 'package:pjt_ditto_front/components/secondary_button.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -17,6 +20,24 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _forgotPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Future.microtask(() {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HistoryScreen()),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,148 +73,99 @@ class LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 20,
               ),
-              if (!_forgotPassword) ... [
-                TextField(
-                  decoration: InputDecoration(
-                    fillColor: Colors.grey[200],
-                    filled: true,
-                    hintText: 'Enter your email',
-                    hintStyle: TextStyle(color: Colors.grey[700]),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  autofocus: true,
-                  controller: _emailController,
-                ),
+              if (!_forgotPassword) ...[
+                CustomTextField(
+                    controller: _emailController, hintText: 'Enter your email'),
                 SizedBox(
                   height: 8,
                 ),
-                TextField(
-                  decoration: InputDecoration(
-                    fillColor: Colors.grey[200],
-                    filled: true,
+                CustomTextField(
+                    controller: _passwordController,
                     hintText: 'Enter your password',
-                    hintStyle: TextStyle(color: Colors.grey[700]),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  controller: _passwordController,
-                ),
+                    obscureText: true),
                 SizedBox(
                   height: 24,
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Material(
-                    elevation: 5.0,
-                    color: mainColor,
-                    borderRadius: BorderRadius.circular(5),
-                    child: MaterialButton(
-                      onPressed: () async {
-                        AuthResult result = await signIn(context, _emailController, _passwordController);
-                        if (result.success && context.mounted) { // context.mountedをチェック
-                          // ログイン完了メッセージを表示
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.message),
-                                duration: Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          }
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => HistoryScreen()),
-                            (Route<dynamic> route) => false,
-                          );
-                        } else {
-                          // ログイン失敗メッセージを表示
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.message),
-                                duration: Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          }
-                        }
+                PrimaryButton(
+                  text: 'ログイン',
+                  color: mainColor,
+                  onPressed: () async {
+                    AuthResult result = await signIn(
+                        context, _emailController, _passwordController);
+                    if (result.success && context.mounted) {
+                      // context.mountedをチェック
+                      // ログイン完了メッセージを表示
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result.message),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HistoryScreen()),
+                        (Route<dynamic> route) => false,
+                      );
+                    } else {
+                      // ログイン失敗メッセージを表示
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result.message),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    }
 
-                        if (result.success) {
-                          final User? user = FirebaseAuth.instance.currentUser;
-                          if (user != null) {
-                            debugPrint("Uid: ${user.uid}");
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HistoryScreen()),
-                              (Route<dynamic> route) => false,
-                            );
-                          }
-                        }
-
-                      },
-                      minWidth: 200.0,
-                      height: 42.0,
-                      child: Text(
-                        'ログイン',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                  ),
+                    if (result.success) {
+                      final User? user = FirebaseAuth.instance.currentUser;
+                      if (user != null) {
+                        debugPrint("Uid: ${user.uid}");
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HistoryScreen()),
+                          (Route<dynamic> route) => false,
+                        );
+                      }
+                    }
+                  },
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Material(
-                    elevation: 5.0,
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
-                    child: MaterialButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, RegisterScreen.id);
-                      },
-                      minWidth: 200.0,
-                      height: 42.0,
-                      child: Text(
-                        '新規登録',
-                        style: TextStyle(
-                          color: mainColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                  ),
+                SecondaryButton(
+                  text: "新規登録",
+                  onPressed: () {
+                    Navigator.pushNamed(context, RegisterScreen.id);
+                  },
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 12.0),
                   child: TextButton(
-                    child: Text(
-                      "パスワードを忘れた方はこちら",
-                      style: TextStyle(
-                        color: mainColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      child: Text(
+                        "パスワードを忘れた方はこちら",
+                        style: TextStyle(
+                          color: mainColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _forgotPassword = true;
-                      });
-                    }
-                  ),
+                      onPressed: () {
+                        setState(() {
+                          _forgotPassword = true;
+                        });
+                      }),
                 ),
-              ] else ... [
+              ] else ...[
                 Text(
                   '登録済みのメールアドレスを入力してください',
-                  textAlign: TextAlign.center, 
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold, 
+                    fontWeight: FontWeight.bold,
                     color: Colors.grey[700],
                   ),
                 ),
@@ -221,8 +193,9 @@ class LoginScreenState extends State<LoginScreen> {
                     child: MaterialButton(
                       onPressed: () async {
                         // パスワードリセット処理
-                        String result = await resetPassword(context, _emailController);
-                        if(context.mounted) {
+                        String result =
+                            await resetPassword(context, _emailController);
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(result),
