@@ -78,6 +78,14 @@ class ChatScreenState extends State<ChatScreen> {
       'message': message,
     };
 
+    setState(() {
+      _messages.insert(0, {
+        "role": "user",
+        "message": message,
+        "created_at": DateTime.now().toIso8601String(),
+      });
+    });
+
     debugPrint("MessageData ${jsonEncode(messageData)}");
 
     try {
@@ -93,12 +101,6 @@ class ChatScreenState extends State<ChatScreen> {
       if (response.statusCode == 200) {
         final responseText = response.body;
         setState(() {
-          _messages.insert(0, {
-            "role": "user",
-            "message": message,
-            "created_at": DateTime.now().toIso8601String(),
-          });
-
           _messages.insert(0, {
             "role": "agent",
             "message": responseText,
@@ -153,7 +155,9 @@ class ChatScreenState extends State<ChatScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(widget.title, style: TextStyle(color: mainColor)),
+        title: Text(widget.title,
+            style: TextStyle(
+                color: Color(0xff0a4d4d), fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.white,
       ),

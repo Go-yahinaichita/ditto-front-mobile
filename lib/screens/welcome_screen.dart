@@ -23,17 +23,19 @@ class WelcomeScreenState extends State<WelcomeScreen> {
         children: [
           // SHOW YOUR AI の背景
           Positioned.fill(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: RotatedBox(
-                quarterTurns: 3,
-                child: Text(
-                  "SHOW YOUR AI",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 100,
-                    height: 1,
-                    fontFamily: "NotoSansJPExtraBold",
+            child: SafeArea(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: RotatedBox(
+                  quarterTurns: 3,
+                  child: Text(
+                    "SHOW YOUR AI",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 125,
+                      height: 0.9,
+                      fontFamily: "NotoSansJPExtraBold",
+                    ),
                   ),
                 ),
               ),
@@ -76,7 +78,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "ある職業についた将来のあなたと話せます。将来何がしたいかわからない。"
+                        "将来のあなたと話せます。将来のために何をすればいいかわからない。"
                         "そんなあなたに送る新感覚AIチャットアプリ",
                         textAlign: TextAlign.start,
                         style: TextStyle(

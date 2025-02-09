@@ -8,26 +8,7 @@ import 'package:pjt_ditto_front/screens/chat_screen.dart';
 class NewChatSetupScreen extends StatefulWidget {
   static const String id = 'new_chat_setup_screen';
 
-  // final String name;
-  // final String age;
-  // final String occupation;
-  // final String experience;
-  // final String skills;
-  // final String constraints;
-  // final String values;
-  // final String goals;
-
-  const NewChatSetupScreen({
-    super.key,
-    // required this.name,
-    // required this.age,
-    // required this.occupation,
-    // required this.experience,
-    // required this.skills,
-    // required this.constraints,
-    // required this.values,
-    // required this.goals,
-  });
+  const NewChatSetupScreen({super.key});
 
   @override
   NewChatSetupScreenState createState() => NewChatSetupScreenState();
@@ -53,7 +34,6 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           'https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid';
 
       final Map<String, dynamic> userInfo = {
-        // 'name': _nameController.text.trim(),
         'age': int.tryParse(_ageController.text.trim()) ?? 20,
         'status': _statusController.text.trim(),
         'skills': [
@@ -71,15 +51,6 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
         'extra': "some extra info",
       };
 
-      // final Map<String, dynamic> userInfo = {
-      //   'age': 20,
-      //   'status': '学生',
-      //   'skills': ['応用情報技術者試験', '自動車免許'],
-      //   'values': 'レスイズモア',
-      //   'restrictions': 'インターンで忙しい',
-      //   'future_goals': ['コンサルタント', 'お金持ち'],
-      // };
-
       try {
         final response = await http.post(
           Uri.parse(apiUrl),
@@ -91,7 +62,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
 
         if (response.statusCode == 200) {
           debugPrint("ユーザー情報送信成功：${response.body}");
-          final responseData = jsonDecode(response.body);
+          final responseData = jsonDecode(utf8.decode(response.bodyBytes));
 
           return responseData;
         } else {
@@ -118,11 +89,12 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "New Chat Setup",
           style: TextStyle(
-            color: Color(0xff0e6666),
+            color: Color(0xff0a4d4d),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -137,72 +109,74 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           },
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // _buildTextField("名前", _nameController),
-            _buildTextField("年齢", _ageController,
-                keyboardType: TextInputType.number),
-            _buildTextField("現在の立場・職業", _statusController),
-            _buildTextField("経験", _experienceController),
-            _buildTextField("スキル・資格", _skillsController),
-            _buildTextField("制約 (経済面・環境面)", _restrictionsController),
-            _buildTextField("価値観", _valuesController),
-            _buildTextField("具体的な目標", _goalsController),
-            const SizedBox(height: 30),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                elevation: 5.0,
-                color: Color(0xff0e6666),
-                borderRadius: BorderRadius.circular(5),
-                child: MaterialButton(
-                  onPressed: () async {
-                    if (uid == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("ログインしてください。")),
-                      );
-                      return;
-                    }
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // _buildTextField("名前", _nameController),
+              _buildTextField("年齢", _ageController,
+                  keyboardType: TextInputType.number),
+              _buildTextField("現在の立場・職業", _statusController),
+              _buildTextField("経験", _experienceController),
+              _buildTextField("スキル・資格", _skillsController),
+              _buildTextField("制約 (経済面・環境面)", _restrictionsController),
+              _buildTextField("価値観", _valuesController),
+              _buildTextField("具体的な目標", _goalsController),
+              const SizedBox(height: 30),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Material(
+                  elevation: 5.0,
+                  color: Color(0xff0e6666),
+                  borderRadius: BorderRadius.circular(5),
+                  child: MaterialButton(
+                    onPressed: () async {
+                      if (uid == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("ログインしてください。")),
+                        );
+                        return;
+                      }
 
-                    if (!validateForm()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("すべての項目を入力してください。")),
-                      );
-                      return;
-                    }
+                      if (!validateForm()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("すべての項目を入力してください。")),
+                        );
+                        return;
+                      }
 
-                    final chatData = await sendUserInfoToServer(uid);
-                    debugPrint("Success $chatData");
+                      final chatData = await sendUserInfoToServer(uid);
+                      debugPrint("Success $chatData");
 
-                    if (chatData != null && mounted) {
-                      Navigator.pushNamed(
-                        context,
-                        ChatScreen.id,
-                        arguments: chatData,
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("チャットの作成に失敗しました。")),
-                      );
-                    }
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: Text(
-                    'Let\'s Chat',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      if (chatData != null && mounted) {
+                        Navigator.pushNamed(
+                          context,
+                          ChatScreen.id,
+                          arguments: chatData,
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("チャットの作成に失敗しました。")),
+                        );
+                      }
+                    },
+                    minWidth: 200.0,
+                    height: 42.0,
+                    child: Text(
+                      'Let\'s Chat',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -215,6 +189,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
+        cursorColor: Color(0xff0a4d4d),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.black54),
@@ -226,7 +201,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
             borderSide: BorderSide(color: Colors.grey),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xff0e6666), width: 2),
+            borderSide: BorderSide(color: Color(0xff0a4d4d), width: 2),
           ),
           filled: true,
           fillColor: Colors.grey[200],
