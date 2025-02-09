@@ -15,14 +15,17 @@ class NewChatSetupScreen extends StatefulWidget {
 }
 
 class NewChatSetupScreenState extends State<NewChatSetupScreen> {
-  // final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final TextEditingController _statusController = TextEditingController();
   final TextEditingController _experienceController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
   final TextEditingController _restrictionsController = TextEditingController();
   final TextEditingController _valuesController = TextEditingController();
   final TextEditingController _goalsController = TextEditingController();
+
+  final List<String> _ages = [
+    ...List.generate(100, (index) => (index).toString())
+  ];
+  String? _selectedAge = "18";
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           'https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid';
 
       final Map<String, dynamic> userInfo = {
-        'age': int.tryParse(_ageController.text.trim()) ?? 20,
+        'age': _selectedAge ?? 18,
         'status': _statusController.text.trim(),
         'skills': [
           ..._skillsController.text.trim().split(',').map((s) => s.trim()),
@@ -67,7 +70,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           return responseData;
         } else {
           debugPrint(
-              "ユーザー情報送信失敗： ${response.statusCode} ${response.request} ${response.headers} ${userInfo} ");
+              "ユーザー情報送信失敗： ${response.statusCode} ${response.request} ${response.headers}");
           return null;
         }
       } catch (e) {
@@ -77,15 +80,12 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
     }
 
     bool validateForm() {
-      return
-          // _nameController.text.trim().isNotEmpty &&
-          _ageController.text.trim().isNotEmpty &&
-              _statusController.text.trim().isNotEmpty &&
-              _experienceController.text.trim().isNotEmpty &&
-              _skillsController.text.trim().isNotEmpty &&
-              _restrictionsController.text.trim().isNotEmpty &&
-              _valuesController.text.trim().isNotEmpty &&
-              _goalsController.text.trim().isNotEmpty;
+      return _statusController.text.trim().isNotEmpty &&
+          _experienceController.text.trim().isNotEmpty &&
+          _skillsController.text.trim().isNotEmpty &&
+          _restrictionsController.text.trim().isNotEmpty &&
+          _valuesController.text.trim().isNotEmpty &&
+          _goalsController.text.trim().isNotEmpty;
     }
 
     return Scaffold(
@@ -115,15 +115,31 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // _buildTextField("名前", _nameController),
-              _buildTextField("年齢", _ageController,
-                  keyboardType: TextInputType.number),
+              Text('将来の夢',
+                  style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold)),
+              SizedBox(height: 5),
+              _buildTextField("具体的な目標", _goalsController),
+              SizedBox(height: 16),
+              Text('自分の情報',
+                  style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                value: _selectedAge,
+                items: _ages,
+                onChanged: (value) => setState(() => _selectedAge = value),
+              ),
+              SizedBox(height: 16),
               _buildTextField("現在の立場・職業", _statusController),
               _buildTextField("経験", _experienceController),
               _buildTextField("スキル・資格", _skillsController),
-              _buildTextField("制約 (経済面・環境面)", _restrictionsController),
+              _buildTextField(
+                  "目標を達成する上での制約 (経済面・環境面)", _restrictionsController),
               _buildTextField("価値観", _valuesController),
-              _buildTextField("具体的な目標", _goalsController),
               const SizedBox(height: 30),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -182,6 +198,37 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
     );
   }
 
+  Widget _buildDropdownField({
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownMenu<String>(
+      initialSelection: value,
+      onSelected: onChanged,
+      width: double.infinity,
+      label: Text("年齢"),
+      dropdownMenuEntries: items.map((item) {
+        return DropdownMenuEntry<String>(
+          value: item,
+          label: item,
+        );
+      }).toList(),
+      menuHeight: 200,
+      menuStyle: const MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(Colors.white), // 背景色を白に設定
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xff0a4d4d), width: 2),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField(String label, TextEditingController controller,
       {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
@@ -203,8 +250,6 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Color(0xff0a4d4d), width: 2),
           ),
-          filled: true,
-          fillColor: Colors.grey[200],
         ),
       ),
     );

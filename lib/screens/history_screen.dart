@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
-import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/authentication/auth.dart';
 import 'package:pjt_ditto_front/screens/change_password_screen.dart';
@@ -52,6 +51,7 @@ class HistoryScreenState extends State<HistoryScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+        if (!mounted) return;
         setState(() {
           chatHistory = data
               .map((chat) => {
@@ -64,12 +64,14 @@ class HistoryScreenState extends State<HistoryScreen> {
           _isLoading = false;
         });
       } else {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });
       }
     } catch (e) {
       debugPrint("error: $e");
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -78,111 +80,29 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          "History",
-          style: const TextStyle(
-            color: Color(0xff0A4D4D),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.grey[300],
-              child: Icon(Icons.add, size: 28, color: Colors.black54),
+        appBar: AppBar(
+          title: Text(
+            "History",
+            style: const TextStyle(
+              color: Color(0xff0A4D4D),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            title: const Text(
-              "新しいチャットを始める",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            onTap: () {
-              Navigator.pushNamed(context, NewChatSetupScreen.id);
-            },
           ),
-          const Divider(),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemCount: chatHistory.length,
-                    itemBuilder: (context, index) {
-                      final chat = chatHistory[index];
-                      return ListTile(
-                        tileColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 20),
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.grey[300],
-                        ),
-                        title: Text(chat['title']!,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                                DateFormat('MM/dd').format(
-                                    DateTime.parse(chat['updated_at']!)),
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.black54)),
-                            Text(
-                                DateFormat('HH:mm').format(
-                                    DateTime.parse(chat['updated_at']!)),
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.black54)),
-                          ],
-                        ),
-                        onTap: () {
-                          Navigator.pushNamed(context, ChatScreen.id,
-                              arguments: {
-                                'id': chat['id'],
-                                'title': chat['title'],
-                                'created_at': chat['created_at'],
-                                'updated_at': chat['updated_at']
-                              });
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        color: Colors.grey[200],
-        notchMargin: 8.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.home, size: 28),
-                onPressed: () {
-                  Navigator.pushNamed(context, WelcomeScreen.id);
-                },
-              ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushNamed(context, NewChatSetupScreen.id);
-                },
-                icon: const Icon(Icons.add, color: Colors.white),
-                label: const Text("New Chat"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: mainColor,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+        ),
+        body: Column(
+          children: [
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.grey[300],
+                child: Icon(Icons.add, size: 28, color: Colors.black54),
               ),
               Builder(
                 builder: (BuildContext context) {
@@ -274,10 +194,88 @@ class HistoryScreenState extends State<HistoryScreen> {
                     },
                   );
                 }
+
               ),
-            ],
+              onTap: () {
+                Navigator.pushNamed(context, NewChatSetupScreen.id);
+              },
+            ),
+            const Divider(),
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: chatHistory.length,
+                      itemBuilder: (context, index) {
+                        final chat = chatHistory[index];
+                        return ListTile(
+                          tileColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 20),
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.grey[300],
+                          ),
+                          title: Text(chat['title']!,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                  DateFormat('MM/dd').format(
+                                      DateTime.parse(chat['updated_at']!)),
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.black54)),
+                              Text(
+                                  DateFormat('HH:mm').format(
+                                      DateTime.parse(chat['updated_at']!)),
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.black54)),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.pushNamed(context, ChatScreen.id,
+                                arguments: {
+                                  'id': chat['id'],
+                                  'title': chat['title'],
+                                  'created_at': chat['created_at'],
+                                  'updated_at': chat['updated_at']
+                                });
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          color: Colors.grey[200],
+          notchMargin: 8.0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.settings, size: 28),
+                  onPressed: () {
+                    Navigator.pushNamed(context, SettingsScreen.id);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, NewChatSetupScreen.id);
+          },
+          backgroundColor: mainColor,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.add, color: Colors.white, size: 30),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }

@@ -159,7 +159,9 @@ class ChatScreenState extends State<ChatScreen> {
           ),
           title: Text(widget.title,
               style: TextStyle(
-                  color: Color(0xff0a4d4d), fontWeight: FontWeight.bold)),
+                  color: Color(0xff0a4d4d),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
           centerTitle: true,
           backgroundColor: Colors.white,
         ),

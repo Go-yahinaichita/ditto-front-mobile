@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'login_screen.dart';
 import 'register_screen.dart';
 
@@ -78,7 +77,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "将来のあなたと話せます。将来のために何をすればいいかわからない。"
+                        "10年後のあなたと話そう。将来のために何をすればいいかわからない。"
                         "そんなあなたに送る新感覚AIチャットアプリ",
                         textAlign: TextAlign.start,
                         style: TextStyle(
