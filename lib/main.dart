@@ -12,7 +12,6 @@ import 'package:pjt_ditto_front/screens/register_screen.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
-import 'package:pjt_ditto_front/screens/settings_screen.dart';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
 import 'package:pjt_ditto_front/screens/change_password_screen.dart';
 
@@ -56,8 +55,6 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const RegisterScreen());
           case HistoryScreen.id:
             return MaterialPageRoute(builder: (_) => HistoryScreen());
-          case SettingsScreen.id:
-            return MaterialPageRoute(builder: (_) => const SettingsScreen());
           case NewChatSetupScreen.id:
             return MaterialPageRoute(builder: (_) => const NewChatSetupScreen());
           case ChangePasswordScreen.id: 

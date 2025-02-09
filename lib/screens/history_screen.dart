@@ -6,7 +6,8 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
-import 'package:pjt_ditto_front/screens/settings_screen.dart';
+import 'package:pjt_ditto_front/authentication/auth.dart';
+import 'package:pjt_ditto_front/screens/change_password_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   static const String id = 'history_screen';
@@ -103,9 +104,97 @@ class HistoryScreenState extends State<HistoryScreen> {
                 backgroundColor: Colors.grey[300],
                 child: Icon(Icons.add, size: 28, color: Colors.black54),
               ),
-              title: const Text(
-                "新しいチャットを始める",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Builder(
+                builder: (BuildContext context) {
+                  return IconButton(
+                    icon: const Icon(Icons.settings, size: 28),
+                    onPressed: () {
+                      final RenderBox button = context.findRenderObject() as RenderBox;
+                      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+                      // ボタンの位置をオーバーレイの座標系で取得
+                      final Offset buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
+                      final Size buttonSize = button.size; 
+                      final Size overlaySize = overlay.size;
+
+                      const double padding = 180;
+                      // RelativeRect の計算（画面右下に対応）
+                      final RelativeRect position = RelativeRect.fromLTRB(
+                        overlaySize.width,
+                        overlaySize.height - buttonSize.height - padding, 
+                        0,
+                        0,
+                      );
+                      debugPrint('buttonPosition.height: ${buttonPosition.dy}');
+                      showMenu(
+                        context: context,
+                        position: position,
+                        items: [
+                          PopupMenuItem(
+                            height: 50, 
+                            child: Container(
+                              color: Colors.white,
+                              child: TextButton(
+                                child: Text(
+                                  "パスワード変更",
+                                  style: TextStyle(
+                                    color: Colors.grey[700],
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(context, 
+                                    MaterialPageRoute(builder: (context) => ChangePasswordScreen(),
+                                      fullscreenDialog: true
+                                    )
+                                  );
+                                }
+                              ),
+                            ),
+                          ),
+                          PopupMenuItem(
+                            child: Container(
+                              color: Colors.white,
+                              child: TextButton(
+                                child: Text(
+                                  "ログアウト",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  Navigator.pop(context); // Close the popup menu
+                                  AuthResult result = await signOut();
+                                  if (result.success && context.mounted) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(result.message),
+                                          duration: Duration(seconds: 2),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    }
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                                      (Route<dynamic> route) => false,
+                                    );
+                                  }
+                                }
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+
               ),
               onTap: () {
                 Navigator.pushNamed(context, NewChatSetupScreen.id);
