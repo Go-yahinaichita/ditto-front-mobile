@@ -50,7 +50,8 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   CustomTextField(
                       controller: _passwordController,
-                      hintText: 'Enter your new password'),
+                      hintText: 'Enter your new password',
+                      obscureText: true),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     child: Material(
