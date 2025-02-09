@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pjt_ditto_front/authentication/auth.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
+import 'package:pjt_ditto_front/screens/change_password_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String id = 'settings_screen';
@@ -30,42 +31,63 @@ class SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      // body配下は適当なので変えて欲しいです！
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: TextButton(
-              child: Text(
-                "ログアウト",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            onPressed: () async {
-              // ログアウト処理
-              SignOutResult result = await signOut();
-              if (result.success && context.mounted) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(result.message),
-                      duration: Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
+            child: Column(
+              children: [
+                TextButton(
+                  child: Text(
+                    "パスワード変更",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                }
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => WelcomeScreen()),
-                  (Route<dynamic> route) => false,
-                );
-              }
-            }
-          ),
+                  ),
+                  onPressed: () {
+                    // パスワード変更処理
+                    Navigator.push(context, 
+                      MaterialPageRoute(builder: (context) => ChangePasswordScreen(),
+                        fullscreenDialog: true
+                      )
+                    );
+                  }
+                ),
+                TextButton(
+                  child: Text(
+                    "ログアウト",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () async {
+                    // ログアウト処理
+                    AuthResult result = await signOut();
+                    if (result.success && context.mounted) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result.message),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                        (Route<dynamic> route) => false,
+                      );
+                    }
+                  }
+                ),
+              ]
+            ),
           ),
         ]
       ),

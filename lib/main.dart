@@ -14,10 +14,12 @@ import 'package:pjt_ditto_front/screens/chat_screen.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 import 'package:pjt_ditto_front/screens/settings_screen.dart';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
-// import 'package:pjt_ditto_front/provider/user_provider.dart';
+import 'package:pjt_ditto_front/screens/change_password_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Flutter のバインディングを初期化
+  //await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform, // Firebase を初期化
   );
@@ -57,8 +59,9 @@ class MyApp extends StatelessWidget {
           case SettingsScreen.id:
             return MaterialPageRoute(builder: (_) => const SettingsScreen());
           case NewChatSetupScreen.id:
-            return MaterialPageRoute(
-                builder: (_) => const NewChatSetupScreen());
+            return MaterialPageRoute(builder: (_) => const NewChatSetupScreen());
+          case ChangePasswordScreen.id: 
+            return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
           case ChatScreen.id:
             if (settings.arguments is Map<String, dynamic>) {
               final chatData = settings.arguments as Map<String, dynamic>;
