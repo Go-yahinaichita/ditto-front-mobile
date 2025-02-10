@@ -57,7 +57,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        "show you your feature",
+                        "Talk to Your Future Self  See Who You Become!",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -77,7 +77,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "10年後のあなたと話そう。将来のために何をすればいいかわからない。"
+                        "10年後のあなたと話そう！将来のために何をすればいいかわからない。"
                         "そんなあなたに送る新感覚AIチャットアプリ",
                         textAlign: TextAlign.start,
                         style: TextStyle(

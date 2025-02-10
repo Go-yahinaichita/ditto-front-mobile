@@ -5,13 +5,15 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final TextInputType keyboardType;
   final bool obscureText;
+  final bool autofocus;
 
   const CustomTextField(
       {super.key,
       required this.controller,
       required this.hintText,
       this.keyboardType = TextInputType.text,
-      this.obscureText = false});
+      this.obscureText = false,
+      this.autofocus = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +21,7 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      autofocus: autofocus,
       cursorColor: Color(0xff0A4D4D),
       decoration: InputDecoration(
         fillColor: Colors.grey[200],

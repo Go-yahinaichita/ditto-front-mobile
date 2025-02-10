@@ -51,9 +51,10 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     height: 20,
                   ),
                   CustomTextField(
-                      controller: _passwordController,
-                      hintText: 'Enter your new password',
-                      obscureText: true),
+                    controller: _passwordController,
+                    hintText: 'Enter your new password',
+                    obscureText: true,
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     child: Material(
@@ -79,6 +80,7 @@ class ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               (Route<dynamic> route) => false,
                             );
                           } else {
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(result.message),

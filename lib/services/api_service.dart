@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // uidをバックエンドに送信する関数
 Future<bool> sendUidToBackend(String uid) async {
-  // TODO: バックエンドのエンドポイントを設定
   final url = Uri.parse(dotenv.env['BACKEND_API_URL']!);
   final response = await http.post(url,
       headers: <String, String>{
@@ -15,11 +14,8 @@ Future<bool> sendUidToBackend(String uid) async {
       }));
 
   if (response.statusCode == 200) {
-    // TODO: バックエンドからのレスポンスを処理
-    // print('UID送信成功');
     return true;
   } else {
-    // print('UID送信失敗: ${response.statusCode}');
     return false;
   }
 }
