@@ -34,11 +34,6 @@ Future<AuthResult> signUp(
       // 新規登録成功時の処理(bodyに付加してバックエンドに送信)
       await user.sendEmailVerification();
       return AuthResult(success: true, message: '確認メールを送信しました');
-      // final String uid = user.uid;
-      // if(await sendUidToBackend(uid)) {
-      //   return SignUpResult(success: true, message: '登録が完了しました');
-      // }
-      // return SignUpResult(success: false, message: 'データの送信に失敗しました');
     }
     return AuthResult(success: false, message: '登録に失敗しました');
   } on FirebaseAuthException catch (e) {
