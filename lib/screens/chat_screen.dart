@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -25,7 +26,6 @@ class ChatScreen extends StatefulWidget {
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  final Color mainColor = Color(0xff0e6666);
   bool _isLoading = true;
   bool _sendingMessage = false;
   String currentReply = '';
@@ -79,7 +79,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   Future<void> _sendMessageToServer(String message) async {
     String apiUrl =
-        "https://ditto-back-feature-1025173260301.asia-northeast1.run.app/api/agents/conversations/${widget.chatId}";
+        "${dotenv.env['BACKEND_API_URL']}conversations/${widget.chatId}";
 
     final Map<String, String> messageData = {
       'message': message,
@@ -93,17 +93,12 @@ class ChatScreenState extends State<ChatScreen> {
       });
     });
 
-    debugPrint("MessageData ${jsonEncode(messageData)}");
-
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(messageData),
       );
-
-      debugPrint("Resopnse ${response.body}");
-      debugPrint("Message: $messageData");
 
       if (response.statusCode == 200) {
         final responseText = response.body;
@@ -121,12 +116,8 @@ class ChatScreenState extends State<ChatScreen> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scrollToBottom();
         });
-      } else {
-        debugPrint(
-            "メッセージ送信失敗: $messageData ${response.statusCode} ${response.request} ${response.headers}");
-      }
+      } 
     } catch (e) {
-      debugPrint("error: $e");
       setState(() {
         _sendingMessage = false;
       });

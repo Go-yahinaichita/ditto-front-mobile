@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
@@ -21,7 +22,6 @@ class HistoryScreen extends StatefulWidget {
 
 class HistoryScreenState extends State<HistoryScreen> {
   List<Map<String, dynamic>> chatHistory = [];
-  final Color mainColor = Color(0xff0e6666);
   bool _isLoading = true;
   String? uid;
   Map<String, Uint8List> imageCache = {};
@@ -47,14 +47,13 @@ class HistoryScreenState extends State<HistoryScreen> {
     if (uid == null) return;
 
     String apiUrl =
-        "https://ditto-back-feature-1025173260301.asia-northeast1.run.app/api/agents/$uid";
+        "${dotenv.env['BACKEND_API_URL']}$uid";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
-        debugPrint("data: $data");
         if (!mounted) return;
 
         setState(() {
@@ -88,7 +87,6 @@ class HistoryScreenState extends State<HistoryScreen> {
         });
       }
     } catch (e) {
-      debugPrint("error: $e");
       if (!mounted) return;
       setState(() {
         _isLoading = false;
@@ -98,8 +96,7 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(
@@ -261,8 +258,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                           .findRenderObject() as RenderBox;
 
                       // ボタンの位置をオーバーレイの座標系で取得
-                      final Offset buttonPosition =
-                          button.localToGlobal(Offset.zero, ancestor: overlay);
                       final Size buttonSize = button.size;
                       final Size overlaySize = overlay.size;
 
@@ -274,7 +269,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                         0,
                         0,
                       );
-                      debugPrint('buttonPosition.height: ${buttonPosition.dy}');
                       showMenu(
                         context: context,
                         position: position,
@@ -318,7 +312,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                                   ),
                                   onPressed: () async {
                                     Navigator.pop(
-                                        context); // Close the popup menu
+                                        context);
                                     AuthResult result = await signOut();
                                     if (result.success && context.mounted) {
                                       if (context.mounted) {
@@ -355,12 +349,11 @@ class HistoryScreenState extends State<HistoryScreen> {
           onPressed: () {
             Navigator.pushNamed(context, NewChatSetupScreen.id);
           },
-          backgroundColor: mainColor,
+          backgroundColor: Color(0xff0e6666),
           shape: const CircleBorder(),
           child: const Icon(Icons.add, color: Colors.white, size: 30),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      ),
-    );
+      );
   }
 }
