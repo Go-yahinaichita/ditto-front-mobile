@@ -27,13 +27,37 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 alignment: Alignment.centerLeft,
                 child: RotatedBox(
                   quarterTurns: 3,
-                  child: Text(
-                    "SHOW YOUR AI",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 125,
-                      height: 0.9,
-                      fontFamily: "NotoSansJPExtraBold",
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "SHO",
+                          style: TextStyle(
+                            color: Colors.white, // ここで色を変更
+                            fontSize: 125,
+                            height: 0.9,
+                            fontFamily: "NotoSansJPExtraBold",
+                          ),
+                        ),
+                        TextSpan(
+                          text: "W YOU",
+                          style: TextStyle(
+                            color: Colors.grey[400], // 通常の色
+                            fontSize: 125,
+                            height: 0.9,
+                            fontFamily: "NotoSansJPExtraBold",
+                          ),
+                        ),
+                        TextSpan(
+                          text: "R AI",
+                          style: TextStyle(
+                            color: Colors.white, // ここで色を変更
+                            fontSize: 125,
+                            height: 0.9,
+                            fontFamily: "NotoSansJPExtraBold",
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

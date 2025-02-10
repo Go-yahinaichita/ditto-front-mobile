@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,7 +10,7 @@ class ChatScreen extends StatefulWidget {
   final int chatId;
   final String title;
   final DateTime createdAt;
-  final String? icon;
+  final Uint8List? icon;
 
   const ChatScreen({
     super.key,
@@ -57,7 +58,9 @@ class ChatScreenState extends State<ChatScreen> {
                     "role": message["role"],
                     "message": message["message"].trim(),
                     "created_at": message["created_at"],
-                    "icon": message["icon"] ?? widget.icon,
+                    "icon": message["icon"] != null
+                        ? base64Decode(message["icon"]!)
+                        : widget.icon,
                   })
               .toList();
           _isLoading = false;
@@ -258,7 +261,7 @@ class ChatScreenState extends State<ChatScreen> {
 class ChatBubble extends StatelessWidget {
   final String text;
   final bool isUser;
-  final String? agentIcon;
+  final Uint8List? agentIcon;
 
   const ChatBubble({
     super.key,
@@ -280,9 +283,8 @@ class ChatBubble extends StatelessWidget {
             child: CircleAvatar(
               radius: 18,
               backgroundColor: Colors.grey[300],
-              backgroundImage: agentIcon != null
-                  ? MemoryImage(base64Decode(agentIcon!))
-                  : null,
+              backgroundImage:
+                  agentIcon != null ? MemoryImage(agentIcon!) : null,
               child: agentIcon == null
                   ? Icon(Icons.person, color: Colors.white)
                   : null,

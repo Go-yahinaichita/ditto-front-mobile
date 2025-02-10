@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pjt_ditto_front/provider/user_provider.dart';
 import 'firebase_options.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -63,13 +65,21 @@ class MyApp extends StatelessWidget {
           case ChatScreen.id:
             if (settings.arguments is Map<String, dynamic>) {
               final chatData = settings.arguments as Map<String, dynamic>;
+
+              Uint8List? iconBytes;
+              if (chatData['icon'] is String) {
+                iconBytes = base64Decode(chatData['icon'] as String);
+              } else if (chatData['icon'] is Uint8List) {
+                iconBytes = chatData['icon'] as Uint8List;
+              }
+
               return MaterialPageRoute(
                 builder: (_) => ChatScreen(
                   chatId: chatData['id'] ?? 0,
                   title: chatData['title'] ?? "No title",
                   createdAt: DateTime.tryParse(chatData['created_at'] ?? "") ??
                       DateTime.now(),
-                  icon: chatData['icon'],
+                  icon: iconBytes,
                 ),
               );
             } else {

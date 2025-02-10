@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:pjt_ditto_front/provider/user_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:pjt_ditto_front/screens/welcome_screen.dart';
 import 'package:pjt_ditto_front/screens/new_chat_setup_screen.dart';
@@ -23,6 +24,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   final Color mainColor = Color(0xff0e6666);
   bool _isLoading = true;
   String? uid;
+  Map<String, Uint8List> imageCache = {};
 
   @override
   void initState() {
@@ -56,15 +58,27 @@ class HistoryScreenState extends State<HistoryScreen> {
         if (!mounted) return;
 
         setState(() {
-          chatHistory = data
-              .map((chat) => {
-                    'id': int.tryParse(chat['id'].toString()) ?? 0,
-                    'title': chat['title'] ?? "No title",
-                    'created_at': chat['created_at'] ?? "xx/xx",
-                    'updated_at': chat['updated_at'] ?? "xx:xx",
-                    'icon': chat['icon'],
-                  })
-              .toList();
+          chatHistory = data.map((chat) {
+            String? iconBase64 = chat['icon'];
+            Uint8List? iconBytes;
+
+            if (iconBase64 != null && iconBase64.isNotEmpty) {
+              if (imageCache.containsKey(iconBase64)) {
+                iconBytes = imageCache[iconBase64];
+              } else {
+                iconBytes = base64Decode(iconBase64);
+                imageCache[iconBase64] = iconBytes;
+              }
+            }
+
+            return {
+              'id': int.tryParse(chat['id'].toString()) ?? 0,
+              'title': chat['title'] ?? "No title",
+              'created_at': chat['created_at'] ?? "xx/xx",
+              'updated_at': chat['updated_at'] ?? "xx:xx",
+              'icon': iconBytes,
+            };
+          }).toList();
           _isLoading = false;
         });
       } else {
@@ -127,18 +141,64 @@ class HistoryScreenState extends State<HistoryScreen> {
                       itemCount: chatHistory.length,
                       itemBuilder: (context, index) {
                         final chat = chatHistory[index];
+                        Uint8List? iconBytes = chat['icon'];
                         return ListTile(
                           tileColor: Colors.white,
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 8, horizontal: 20),
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[300],
-                            backgroundImage: chat['icon'] != null
-                                ? MemoryImage(base64Decode(chat['icon']))
-                                : null,
-                            child: chat['icon'] == null
-                                ? Icon(Icons.person, color: Colors.white)
-                                : null,
+                          leading: GestureDetector(
+                            onTap: () {
+                              if (chat['icon'] != null) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      backgroundColor: Colors.black54,
+                                      insetPadding: EdgeInsets.all(10),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () => Navigator.pop(context),
+                                            child: Container(
+                                              color: Colors.transparent,
+                                              child: Center(
+                                                child: Image.memory(
+                                                  iconBytes!,
+                                                  fit:
+                                                      BoxFit.contain, // 画像サイズ調整
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            right: 10,
+                                            child: IconButton(
+                                              icon: Icon(Icons.close,
+                                                  color: Colors.white,
+                                                  size: 30),
+                                              onPressed: () => Navigator.pop(
+                                                  context), // バツボタンで閉じる
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey[300],
+                              backgroundImage: iconBytes != null
+                                  ? MemoryImage(iconBytes)
+                                  : null,
+                              child: iconBytes == null
+                                  ? const Icon(Icons.person,
+                                      color: Colors.white)
+                                  : null,
+                            ),
                           ),
                           title: Text(chat['title']!,
                               style:
@@ -147,26 +207,33 @@ class HistoryScreenState extends State<HistoryScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                  DateFormat('MM/dd').format(
-                                      DateTime.parse(chat['created_at']!)),
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.black54)),
+                                DateFormat('MM/dd').format(
+                                  DateTime.parse(chat['created_at']!),
+                                ),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54),
+                              ),
                               Text(
-                                  DateFormat('HH:mm').format(
-                                      DateTime.parse(chat['created_at']!)),
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.black54)),
+                                DateFormat('HH:mm').format(
+                                  DateTime.parse(chat['created_at']!),
+                                ),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54),
+                              ),
                             ],
                           ),
                           onTap: () {
-                            Navigator.pushNamed(context, ChatScreen.id,
-                                arguments: {
-                                  'id': chat['id'],
-                                  'title': chat['title'],
-                                  'created_at': chat['created_at'],
-                                  'updated_at': chat['updated_at'],
-                                  'icon': chat['icon'],
-                                });
+                            Navigator.pushNamed(
+                              context,
+                              ChatScreen.id,
+                              arguments: {
+                                'id': chat['id'],
+                                'title': chat['title'],
+                                'created_at': chat['created_at'],
+                                'updated_at': chat['updated_at'],
+                                'icon': chat['icon'],
+                              },
+                            );
                           },
                         );
                       },
