@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:pjt_ditto_front/provider/user_provider.dart';
 import 'package:pjt_ditto_front/screens/chat_screen.dart';
@@ -31,11 +32,10 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final String? uid = Provider.of<UserProvider>(context).uid;
-    debugPrint("UID: $uid");
 
     Future<Map<String, dynamic>?> sendUserInfoToServer(String uid) async {
       String apiUrl =
-          'https://ditto-back-feature-1025173260301.asia-northeast1.run.app/api/agents/$uid';
+          '${dotenv.env['BACKEND_API_URL']}$uid';
 
       final Map<String, dynamic> userInfo = {
         'age': _selectedAge,
@@ -61,21 +61,14 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           body: jsonEncode(userInfo),
         );
 
-        debugPrint(
-            "Response ${response.body} ${response.statusCode} ${response.request} ${response.headers}");
-
         if (response.statusCode == 200) {
-          debugPrint("ユーザー情報送信成功：${response.body}");
           final responseData = jsonDecode(utf8.decode(response.bodyBytes));
 
           return responseData;
         } else {
-          debugPrint(
-              "ユーザー情報送信失敗： ${response.statusCode} ${response.request} ${response.headers}");
           return null;
         }
       } catch (e) {
-        debugPrint("エラー: $e");
         return null;
       }
     }
@@ -169,7 +162,6 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
                       });
 
                       final chatData = await sendUserInfoToServer(uid);
-                      debugPrint("Success $chatData");
 
                       if (chatData != null && context.mounted) {
                         Navigator.pushNamed(

@@ -12,7 +12,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class WelcomeScreenState extends State<WelcomeScreen> {
-  final Color mainColor = Color(0xff0e6666);
 
   @override
   Widget build(BuildContext context) {

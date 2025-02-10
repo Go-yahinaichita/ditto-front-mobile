@@ -137,7 +137,6 @@ class LoginScreenState extends State<LoginScreen> {
                     if (result.success) {
                       final User? user = FirebaseAuth.instance.currentUser;
                       if (user != null) {
-                        debugPrint("Uid: ${user.uid}");
                         if (!context.mounted) return;
                         Navigator.pushAndRemoveUntil(
                           context,
