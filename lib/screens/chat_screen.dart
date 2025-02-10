@@ -41,7 +41,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   Future<void> _getChatHistory() async {
     String apiUrl =
-        "https://ditto-back-feature-1025173260301.asia-northeast1.run.app/api/agents/conversations/${widget.chatId}";
+        "${dotenv.env['BACKEND_API_URL']}conversations/${widget.chatId}";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -145,61 +145,59 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HistoryScreen()),
-                (Route<dynamic> route) => false,
-              );
-            },
+    return Scaffold(
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
           ),
-          title: Text(widget.title,
-              style: TextStyle(
-                  color: Color(0xff0a4d4d),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          backgroundColor: Colors.white,
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HistoryScreen()),
+              (Route<dynamic> route) => false,
+            );
+          },
         ),
-        body: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Column(
-            children: [
-              Expanded(
-                child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xff0a4d4d),
+        title: Text(widget.title,
+            style: TextStyle(
+                color: Color(0xff0a4d4d),
+                fontSize: 18,
+                fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+      ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Column(
+          children: [
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xff0a4d4d),
+                      ),
+                    )
+                  : _messages.isEmpty
+                      ? const Center(child: Text("メッセージ履歴なし"))
+                      : ListView.builder(
+                          itemCount: _messages.length,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            final message = _messages[index];
+                            return ChatBubble(
+                              text: message['message'] ?? '',
+                              isUser: message['role'] == 'user',
+                              agentIcon: message['icon'] ?? widget.icon,
+                            );
+                          },
                         ),
-                      )
-                    : _messages.isEmpty
-                        ? const Center(child: Text("メッセージ履歴なし"))
-                        : ListView.builder(
-                            itemCount: _messages.length,
-                            reverse: true,
-                            itemBuilder: (context, index) {
-                              final message = _messages[index];
-                              return ChatBubble(
-                                text: message['message'] ?? '',
-                                isUser: message['role'] == 'user',
-                                agentIcon: message['icon'] ?? widget.icon,
-                              );
-                            },
-                          ),
-              ),
-              textInputWidget(),
-            ],
-          ),
+            ),
+            textInputWidget(),
+          ],
         ),
       ),
     );
