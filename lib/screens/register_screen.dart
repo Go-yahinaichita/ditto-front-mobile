@@ -17,6 +17,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   final Color mainColor = Color(0xff0e6666);
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +55,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                 CustomTextField(
                   controller: _emailController,
                   hintText: 'Enter your email',
+                  autofocus: true,
                 ),
                 const SizedBox(height: 8),
                 CustomTextField(
@@ -65,6 +67,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                 PrimaryButton(
                   text: '新規登録',
                   onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
                     AuthResult result = await signUp(
                         context, _emailController, _passwordController);
                     if (result.success && context.mounted) {
@@ -82,6 +87,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                         (Route<dynamic> route) => false,
                       );
                     } else {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(result.message),
@@ -90,9 +96,12 @@ class RegisterScreenState extends State<RegisterScreen> {
                         ),
                       );
                     }
+                    setState(() {
+                      isLoading = false;
+                    });
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 SecondaryButton(
                   text: 'ログイン',
                   onPressed: () {

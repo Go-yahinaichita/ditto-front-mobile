@@ -10,7 +10,9 @@ class AuthResult {
 }
 
 // 新規登録関数
-Future<AuthResult> signUp(BuildContext context, TextEditingController emailController,
+Future<AuthResult> signUp(
+    BuildContext context,
+    TextEditingController emailController,
     TextEditingController passwordController) async {
   try {
     // メールアドレスとパスワードのnullチェック
@@ -22,9 +24,9 @@ Future<AuthResult> signUp(BuildContext context, TextEditingController emailContr
 
     final UserCredential userCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        );
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
     final User? user = userCredential.user;
 
@@ -60,12 +62,15 @@ Future<AuthResult> signUp(BuildContext context, TextEditingController emailContr
     return AuthResult(success: false, message: errorMessage);
   } catch (e) {
     // 予期しないエラー
-    return AuthResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
+    return AuthResult(
+        success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
 }
 
 // ログイン関数
-Future<AuthResult> signIn(BuildContext context, TextEditingController emailController, 
+Future<AuthResult> signIn(
+    BuildContext context,
+    TextEditingController emailController,
     TextEditingController passwordController) async {
   try {
     // メールアドレスとパスワードのnullチェック
@@ -75,18 +80,15 @@ Future<AuthResult> signIn(BuildContext context, TextEditingController emailContr
       return AuthResult(success: false, message: 'パスワードを入力してください。');
     }
 
-    final UserCredential userCredential = 
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
     final User? user = userCredential.user;
 
     if (user != null && user.emailVerified) {
-      // ログイン成功時の処理(bodyに付加してバックエンドに送信)
-      // TODO: final String uid = user.uid;
-      // TODO: await sendUidToBackend(uid);
       return AuthResult(success: true, message: 'ログインしました');
     }
     return AuthResult(success: false, message: 'メールアドレスが確認されていません');
@@ -114,7 +116,8 @@ Future<AuthResult> signIn(BuildContext context, TextEditingController emailContr
     return AuthResult(success: false, message: errorMessage);
   } catch (e) {
     // 予期しないエラー
-    return AuthResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
+    return AuthResult(
+        success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
 }
 
@@ -128,9 +131,11 @@ Future<AuthResult> signOut() async {
 }
 
 // パスワードリセット関数
-Future<String> resetPassword(BuildContext context, TextEditingController emailController) async {
+Future<String> resetPassword(
+    BuildContext context, TextEditingController emailController) async {
   try {
-    await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+    await FirebaseAuth.instance
+        .sendPasswordResetEmail(email: emailController.text.trim());
     return 'パスワードリセットメールを送信しました';
   } catch (e) {
     return 'パスワードリセットに失敗しました: $e';
@@ -138,9 +143,11 @@ Future<String> resetPassword(BuildContext context, TextEditingController emailCo
 }
 
 // パスワード変更関数
-Future<AuthResult> updatePassword(BuildContext context, TextEditingController passwordController) async {
+Future<AuthResult> updatePassword(
+    BuildContext context, TextEditingController passwordController) async {
   try {
-    await FirebaseAuth.instance.currentUser?.updatePassword(passwordController.text.trim());
+    await FirebaseAuth.instance.currentUser
+        ?.updatePassword(passwordController.text.trim());
     return AuthResult(success: true, message: 'パスワードを変更しました');
   } on FirebaseAuthException catch (e) {
     String errorMessage;
@@ -156,6 +163,7 @@ Future<AuthResult> updatePassword(BuildContext context, TextEditingController pa
     }
     return AuthResult(success: false, message: errorMessage);
   } catch (e) {
-    return AuthResult(success: false, message: '予期しないエラーが発生しました。 error code: $e');
+    return AuthResult(
+        success: false, message: '予期しないエラーが発生しました。 error code: $e');
   }
 }

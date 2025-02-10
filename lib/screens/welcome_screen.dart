@@ -27,13 +27,37 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 alignment: Alignment.centerLeft,
                 child: RotatedBox(
                   quarterTurns: 3,
-                  child: Text(
-                    "SHOW YOUR AI",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 125,
-                      height: 0.9,
-                      fontFamily: "NotoSansJPExtraBold",
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "SHO",
+                          style: TextStyle(
+                            color: Colors.white, // ここで色を変更
+                            fontSize: 125,
+                            height: 0.9,
+                            fontFamily: "NotoSansJPExtraBold",
+                          ),
+                        ),
+                        TextSpan(
+                          text: "W YOU",
+                          style: TextStyle(
+                            color: Colors.grey[400], // 通常の色
+                            fontSize: 125,
+                            height: 0.9,
+                            fontFamily: "NotoSansJPExtraBold",
+                          ),
+                        ),
+                        TextSpan(
+                          text: "R AI",
+                          style: TextStyle(
+                            color: Colors.white, // ここで色を変更
+                            fontSize: 125,
+                            height: 0.9,
+                            fontFamily: "NotoSansJPExtraBold",
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -57,7 +81,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        "show you your feature",
+                        "Talk to Your Future Self  See Who You Become!",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -77,7 +101,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "10年後のあなたと話そう。将来のために何をすればいいかわからない。"
+                        "10年後のあなたと話そう！将来のために何をすればいいかわからない。"
                         "そんなあなたに送る新感覚AIチャットアプリ",
                         textAlign: TextAlign.start,
                         style: TextStyle(

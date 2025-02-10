@@ -26,6 +26,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
     ...List.generate(100, (index) => (index).toString())
   ];
   String? _selectedAge = "18";
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +35,10 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
 
     Future<Map<String, dynamic>?> sendUserInfoToServer(String uid) async {
       String apiUrl =
-          'https://ditto-back-develop-1025173260301.asia-northeast1.run.app/api/agents/$uid';
+          'https://ditto-back-feature-1025173260301.asia-northeast1.run.app/api/agents/$uid';
 
       final Map<String, dynamic> userInfo = {
-        'age': _selectedAge ?? 18,
+        'age': _selectedAge,
         'status': _statusController.text.trim(),
         'skills': [
           ..._skillsController.text.trim().split(',').map((s) => s.trim()),
@@ -50,7 +51,6 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
             .split(',')
             .map((s) => s.trim())
             .toList(),
-        'experience': _experienceController.text.trim(),
         'extra': "some extra info",
       };
 
@@ -61,7 +61,8 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
           body: jsonEncode(userInfo),
         );
 
-        debugPrint("Response ${response.body}");
+        debugPrint(
+            "Response ${response.body} ${response.statusCode} ${response.request} ${response.headers}");
 
         if (response.statusCode == 200) {
           debugPrint("ユーザー情報送信成功：${response.body}");
@@ -139,7 +140,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
               _buildTextField("スキル・資格", _skillsController),
               _buildTextField(
                   "目標を達成する上での制約 (経済面・環境面)", _restrictionsController),
-              _buildTextField("価値観", _valuesController),
+              _buildTextField("大切にしている価値観", _valuesController),
               const SizedBox(height: 30),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -163,31 +164,46 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
                         return;
                       }
 
+                      setState(() {
+                        isLoading = true;
+                      });
+
                       final chatData = await sendUserInfoToServer(uid);
                       debugPrint("Success $chatData");
 
-                      if (chatData != null && mounted) {
+                      if (chatData != null && context.mounted) {
                         Navigator.pushNamed(
                           context,
                           ChatScreen.id,
                           arguments: chatData,
                         );
                       } else {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("チャットの作成に失敗しました。")),
                         );
                       }
+                      setState(() {
+                        isLoading = false;
+                      });
                     },
                     minWidth: 200.0,
                     height: 42.0,
-                    child: Text(
-                      'Let\'s Chat',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
+                    child: isLoading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 3),
+                          )
+                        : Text(
+                            'Let\'s Chat！',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -236,6 +252,7 @@ class NewChatSetupScreenState extends State<NewChatSetupScreen> {
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
+        maxLines: null,
         cursorColor: Color(0xff0a4d4d),
         decoration: InputDecoration(
           labelText: label,

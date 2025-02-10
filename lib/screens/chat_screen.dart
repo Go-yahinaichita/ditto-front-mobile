@@ -1,6 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:pjt_ditto_front/screens/history_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -8,12 +10,14 @@ class ChatScreen extends StatefulWidget {
   final int chatId;
   final String title;
   final DateTime createdAt;
+  final Uint8List? icon;
 
   const ChatScreen({
     super.key,
     required this.chatId,
     required this.title,
     required this.createdAt,
+    required this.icon,
   });
 
   @override
@@ -54,6 +58,9 @@ class ChatScreenState extends State<ChatScreen> {
                     "role": message["role"],
                     "message": message["message"].trim(),
                     "created_at": message["created_at"],
+                    "icon": message["icon"] != null
+                        ? base64Decode(message["icon"]!)
+                        : widget.icon,
                   })
               .toList();
           _isLoading = false;
@@ -105,6 +112,7 @@ class ChatScreenState extends State<ChatScreen> {
             "role": "agent",
             "message": responseText.trim(),
             "created_at": DateTime.now().toIso8601String(),
+            'icon': widget.icon
           });
 
           _sendingMessage = false;
@@ -149,13 +157,20 @@ class ChatScreenState extends State<ChatScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
               color: Colors.black,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                (Route<dynamic> route) => false,
+              );
+            },
           ),
           title: Text(widget.title,
               style: TextStyle(
@@ -171,7 +186,11 @@ class ChatScreenState extends State<ChatScreen> {
             children: [
               Expanded(
                 child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xff0a4d4d),
+                        ),
+                      )
                     : _messages.isEmpty
                         ? const Center(child: Text("メッセージ履歴なし"))
                         : ListView.builder(
@@ -182,6 +201,7 @@ class ChatScreenState extends State<ChatScreen> {
                               return ChatBubble(
                                 text: message['message'] ?? '',
                                 isUser: message['role'] == 'user',
+                                agentIcon: message['icon'] ?? widget.icon,
                               );
                             },
                           ),
@@ -218,7 +238,8 @@ class ChatScreenState extends State<ChatScreen> {
                 onSubmitted: (_) => _sendMessage(),
                 keyboardType: TextInputType.multiline,
                 enableSuggestions: true,
-                autocorrect: true,
+                maxLines: null,
+                autocorrect: false,
               ),
             ),
           ),
@@ -228,7 +249,7 @@ class ChatScreenState extends State<ChatScreen> {
               onPressed: _sendingMessage ? null : _sendMessage,
               icon: Icon(Icons.send),
               iconSize: 30,
-              color: Colors.black,
+              color: Colors.black87,
             ),
           ),
         ],
@@ -240,39 +261,60 @@ class ChatScreenState extends State<ChatScreen> {
 class ChatBubble extends StatelessWidget {
   final String text;
   final bool isUser;
+  final Uint8List? agentIcon;
 
   const ChatBubble({
     super.key,
     required this.text,
     required this.isUser,
+    required this.agentIcon,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: isUser
-            ? EdgeInsets.fromLTRB(50, 5, 10, 0)
-            : EdgeInsets.fromLTRB(10, 5, 50, 0),
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isUser ? Color(0xff0e6666) : Colors.grey[300],
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-            bottomLeft: isUser ? Radius.circular(20) : Radius.zero,
-            bottomRight: isUser ? Radius.zero : Radius.circular(20),
+    return Row(
+      mainAxisAlignment:
+          isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (!isUser) // agent の場合のみ CircleAvatar を表示
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.grey[300],
+              backgroundImage:
+                  agentIcon != null ? MemoryImage(agentIcon!) : null,
+              child: agentIcon == null
+                  ? Icon(Icons.person, color: Colors.white)
+                  : null,
+            ),
+          ),
+        Flexible(
+          child: Container(
+            margin: isUser
+                ? EdgeInsets.fromLTRB(50, 5, 10, 8)
+                : EdgeInsets.fromLTRB(10, 5, 50, 8),
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isUser ? Color(0xff0e6666) : Colors.grey[300],
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+                bottomLeft: isUser ? Radius.circular(20) : Radius.zero,
+                bottomRight: isUser ? Radius.zero : Radius.circular(20),
+              ),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                color: isUser ? Colors.white : Colors.black,
+              ),
+            ),
           ),
         ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 16,
-            color: isUser ? Colors.white : Colors.black,
-          ),
-        ),
-      ),
+      ],
     );
   }
 }

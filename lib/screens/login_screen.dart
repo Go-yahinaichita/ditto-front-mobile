@@ -20,6 +20,7 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _forgotPassword = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class LoginScreenState extends State<LoginScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       Future.microtask(() {
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HistoryScreen()),
@@ -75,7 +77,10 @@ class LoginScreenState extends State<LoginScreen> {
               ),
               if (!_forgotPassword) ...[
                 CustomTextField(
-                    controller: _emailController, hintText: 'Enter your email'),
+                  controller: _emailController,
+                  hintText: 'Enter your email',
+                  autofocus: true,
+                ),
                 SizedBox(
                   height: 8,
                 ),
@@ -94,7 +99,10 @@ class LoginScreenState extends State<LoginScreen> {
                         context, _emailController, _passwordController);
                     if (result.success && context.mounted) {
                       // context.mountedをチェック
-                      // ログイン完了メッセージを表示
+                      // ログイン完了メッセージを表示a
+                      setState(() {
+                        isLoading = true;
+                      });
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -122,11 +130,15 @@ class LoginScreenState extends State<LoginScreen> {
                         );
                       }
                     }
+                    setState(() {
+                      isLoading = false;
+                    });
 
                     if (result.success) {
                       final User? user = FirebaseAuth.instance.currentUser;
                       if (user != null) {
                         debugPrint("Uid: ${user.uid}");
+                        if (!context.mounted) return;
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
@@ -144,21 +156,24 @@ class LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                  child: TextButton(
-                      child: Text(
-                        "パスワードを忘れた方はこちら",
-                        style: TextStyle(
-                          color: mainColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  padding: EdgeInsets.symmetric(vertical: 1.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                        child: Text(
+                          "パスワードを忘れた方はこちら",
+                          style: TextStyle(
+                            color: mainColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _forgotPassword = true;
-                        });
-                      }),
+                        onPressed: () {
+                          setState(() {
+                            _forgotPassword = true;
+                          });
+                        }),
+                  ),
                 ),
               ] else ...[
                 Text(
@@ -172,17 +187,10 @@ class LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 12,
                 ),
-                TextField(
-                  decoration: InputDecoration(
-                    fillColor: Colors.grey[200],
-                    filled: true,
-                    hintText: 'Enter your email',
-                    hintStyle: TextStyle(color: Colors.grey[700]),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  autofocus: true,
+                CustomTextField(
                   controller: _emailController,
+                  hintText: 'Enter your email',
+                  autofocus: true,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
